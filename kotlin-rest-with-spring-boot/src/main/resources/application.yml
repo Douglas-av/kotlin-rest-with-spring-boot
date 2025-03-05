@@ -1,1 +1,14 @@
 #spring.application.name=kotlin-rest-with-spring-boot
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/rest_with_spring_boot_docosal?useSSL=false&serverTimezone=UTC
+    username: root
+    password: admin
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    format_sql: true
+    use_sql_comments: true
+    show-sql: true
