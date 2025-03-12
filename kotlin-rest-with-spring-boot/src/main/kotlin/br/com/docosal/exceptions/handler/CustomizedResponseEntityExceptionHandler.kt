@@ -13,16 +13,17 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.lang.Exception
 import java.util.*
 
-@ControllerAdvice
-@RestController
+//@ControllerAdvice
+//@RestController
 class CustomizedResponseEntityExceptionHandler : ResponseEntityExceptionHandler(){
 
     @ExceptionHandler(Exception::class)
     fun handleAllExceptions(ex: Exception, request: WebRequest): ResponseEntity<ExceptionResponse> {
         val exceptionResponse = ExceptionResponse(
-            Date(),
             ex.message,
-            request.getDescription(false)
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            request.getDescription(false),
+
         )
         return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR)
     }
@@ -30,17 +31,18 @@ class CustomizedResponseEntityExceptionHandler : ResponseEntityExceptionHandler(
     @ExceptionHandler(ResourceNotFoundException::class)
     fun resourceNotFoundException(ex: Exception, request: WebRequest): ResponseEntity<ExceptionResponse> {
         val exceptionResponse = ExceptionResponse(
-            Date(),
             ex.message,
+            HttpStatus.NOT_FOUND.value(),
             request.getDescription(false)
+
         )
         return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND)
     }
     @ExceptionHandler(RequiredObjectIsNullException::class)
     fun handleBadRequestException(ex: Exception, request: WebRequest): ResponseEntity<ExceptionResponse> {
         val exceptionResponse = ExceptionResponse(
-            Date(),
             ex.message,
+            HttpStatus.BAD_REQUEST.value(),
             request.getDescription(false)
         )
         return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST)

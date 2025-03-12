@@ -1,9 +1,11 @@
 package br.com.docosal.exceptions
 
-import java.util.Date
+import java.time.LocalDateTime
 
-class ExceptionResponse (
-    val timestamp: Date,
+data class ExceptionResponse (
     val message: String?,
-    val details: String
+    val status: Int,
+    val details: String = "",
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+
 )
