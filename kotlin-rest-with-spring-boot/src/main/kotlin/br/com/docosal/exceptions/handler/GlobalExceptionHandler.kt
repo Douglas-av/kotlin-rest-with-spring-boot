@@ -4,11 +4,11 @@ import br.com.docosal.exceptions.ExceptionResponse
 import br.com.docosal.exceptions.ResourceNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -37,9 +37,15 @@ class GlobalExceptionHandler {
         return ResponseEntity(errorResponse, HttpStatus.NOT_FOUND)
     }
 
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResourceFoundException(ex: NoResourceFoundException): ResponseEntity<ExceptionResponse> {
+        val errorResponse = ExceptionResponse("Esta pagina nao e valida. ${ex.message}", HttpStatus.NOT_FOUND.value() )
+        return ResponseEntity(errorResponse, HttpStatus.NOT_FOUND)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGenericException(ex: Exception): ResponseEntity<ExceptionResponse> {
-        val errorResponse = ExceptionResponse("Erro interno no servidor. ${ex.message}", HttpStatus.INTERNAL_SERVER_ERROR.value() )
+        val errorResponse = ExceptionResponse("Erro interno no servidor. ${ex.message}. ${ex.cause}", HttpStatus.INTERNAL_SERVER_ERROR.value() )
         return ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 }
