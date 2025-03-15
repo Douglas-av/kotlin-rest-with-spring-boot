@@ -3,7 +3,7 @@ package br.com.docosal.unittests.mapper
 import br.com.docosal.data.vo.v1.PersonVO
 import br.com.docosal.mapper.DozerMapper
 import br.com.docosal.model.Person
-import br.com.docosal.unittests.mapper.mocks.MockPerson
+import br.com.docosal.unittests.mocks.MockPerson
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

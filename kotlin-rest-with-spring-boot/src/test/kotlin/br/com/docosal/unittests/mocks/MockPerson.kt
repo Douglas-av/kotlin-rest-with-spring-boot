@@ -1,4 +1,4 @@
-package br.com.docosal.unittests.mapper.mocks
+package br.com.docosal.unittests.mocks
 
 import br.com.docosal.data.vo.v1.PersonVO
 import br.com.docosal.model.Person

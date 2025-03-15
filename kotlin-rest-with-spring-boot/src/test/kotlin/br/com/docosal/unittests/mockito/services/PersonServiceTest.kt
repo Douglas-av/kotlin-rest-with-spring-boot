@@ -1,9 +1,9 @@
-package br.com.docosal.mockito.services
+package br.com.docosal.unittests.mockito.services
 
 import br.com.docosal.exceptions.RequiredObjectIsNullException
 import br.com.docosal.repository.PersonRepository
 import br.com.docosal.services.PersonService
-import br.com.docosal.unittests.mapper.mocks.MockPerson
+import br.com.docosal.unittests.mocks.MockPerson
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
