@@ -1,8 +1,8 @@
 package br.com.docosal.services
 
-import br.com.docosal.controllers.PersonController
+import br.com.docosal.controllers.BookController
 import br.com.docosal.data.vo.v1.BookDTO
-import br.com.docosal.data.vo.v1.PersonVO
+import br.com.docosal.exceptions.RequiredObjectIsNullException
 import br.com.docosal.exceptions.ResourceNotFoundException
 import br.com.docosal.mapper.DozerMapper
 import br.com.docosal.mapper.custom.BookMapper
@@ -11,7 +11,6 @@ import br.com.docosal.repository.BookRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
-import java.util.Optional
 import java.util.logging.Logger
 
 @Service
@@ -28,12 +27,15 @@ class BookService {
     fun findAll(): List<BookDTO> {
         logger.info("Finding all books!")
         var books: List<Book> = repository.findAll()
-        var bookDTO: ArrayList<BookDTO> = DozerMapper.parseListObjects(books, BookDTO::class.java)
+        var booksDTO: ArrayList<BookDTO> = DozerMapper.parseListObjects(books, BookDTO::class.java)
 //        for (book in books){
 //            bookDTO.add(mapper.mapToBookDTO(book))
 //        }
-
-        return bookDTO
+        for (bookDTO in booksDTO){
+            val withSelfRel = linkTo(BookController::class.java).slash(bookDTO.key).withSelfRel()
+            bookDTO.add(withSelfRel)
+        }
+        return booksDTO
     }
 
     fun findById(id : Long): BookDTO {
@@ -41,16 +43,22 @@ class BookService {
         var book = repository.findById(id)
             .orElseThrow { ResourceNotFoundException("Recurso nao encontrado.") }
         var bookDTO: BookDTO = DozerMapper.parseObject(book, BookDTO::class.java)
-
+        val withSelfRel = linkTo(BookController::class.java).slash(bookDTO.key).withSelfRel()
+        bookDTO.add(withSelfRel)
         return bookDTO
     }
 
-    fun create(bookDTO: BookDTO): BookDTO{
-        var book : Book = mapper.mapToBookEntity(bookDTO)
-        return DozerMapper.parseObject(repository.save(book), BookDTO::class.java)
+    fun create(bookDTO: BookDTO?): BookDTO{
+        if (bookDTO == null) throw  RequiredObjectIsNullException()
+        var book : Book = DozerMapper.parseObject(bookDTO, Book::class.java)
+        var bookDTOCreated =  DozerMapper.parseObject(repository.save(book), BookDTO::class.java)
+        val withSelfRel = linkTo(BookController::class.java).slash(bookDTOCreated.key).withSelfRel()
+        bookDTOCreated.add(withSelfRel)
+        return bookDTOCreated
     }
 
-    fun update(bookDTO: BookDTO): BookDTO{
+    fun update(bookDTO: BookDTO?): BookDTO{
+        if (bookDTO == null) throw  RequiredObjectIsNullException()
         logger.info("Updating a book! ID: ${bookDTO.key}")
         var book : Book = repository.findById(bookDTO.key).
         orElseThrow { ResourceNotFoundException("Nao existe um livro com o ID: ${bookDTO.key}") }
@@ -60,7 +68,7 @@ class BookService {
         book.launchDate = bookDTO.launchDate
 
         var bookDTOReg: BookDTO = DozerMapper.parseObject(repository.save(book), BookDTO::class.java)
-        val withSelfRel = linkTo(PersonController::class.java).slash(bookDTOReg.key).withSelfRel()
+        val withSelfRel = linkTo(BookController::class.java).slash(bookDTOReg.key).withSelfRel()
         bookDTOReg.add(withSelfRel)
         return bookDTOReg
     }
