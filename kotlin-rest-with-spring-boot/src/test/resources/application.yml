@@ -1,16 +1,15 @@
 #spring.application.name=kotlin-rest-with-spring-boot
+server:
+  port: 8888
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/rest_with_spring_boot_docosal?useSSL=false&serverTimezone=UTC
-    username: root
-    password: admin
   jpa:
     hibernate:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
     format_sql: true
     show-sql: true
 spring-doc:

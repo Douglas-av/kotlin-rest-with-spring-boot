@@ -30,6 +30,8 @@
 		<java.version>21</java.version>
 		<kotlin.version>1.9.25</kotlin.version>
 		<dozer.version>7.0.0</dozer.version>
+		<testcontainers.version>1.20.6</testcontainers.version>
+		<rest-assured.version>5.5.1</rest-assured.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -89,6 +91,24 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
