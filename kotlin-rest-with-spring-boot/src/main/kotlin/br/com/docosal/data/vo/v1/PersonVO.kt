@@ -20,7 +20,7 @@ data class PersonVO (
     var lastName: String = "",
     var address: String = "",
 
-    @field:JsonIgnore
+//    @field:JsonIgnore
     var gender: String = ""
 
 ) : RepresentationModel<PersonVO>()

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+//@CrossOrigin
 @RestController
 @RequestMapping("/api/person/v1")
 @Tag(name="People", description="Endpoints for Managing People.")
@@ -80,6 +81,7 @@ class PersonController {
         return service.findAllByFirstName(firstName)
     }
 
+    @CrossOrigin(origins = ["http://localhost:8080"])
     @Operation(summary = "Finds a Person By ID", description = "Finds a Person By ID",
         tags = ["People"],
         responses = [
@@ -108,6 +110,7 @@ class PersonController {
         return service.findById(id)
     }
 
+    @CrossOrigin(origins = ["http://localhost:8080"])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML],
         produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Adds a new Person", description = "Adds a new Person",
@@ -134,8 +137,29 @@ class PersonController {
         return service.create(personVO)
     }
 
+
     @PostMapping(value=["/v2"],consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML],
         produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
+    @Operation(summary = "Adds a new Person V2", description = "Adds a new Person V2",
+        tags = ["People"],
+        responses = [
+            ApiResponse(description = "Success", responseCode = "200", content = [
+                Content(schema = Schema(implementation = PersonVO::class))
+            ]),
+            ApiResponse(description = "Bad Request", responseCode = "400", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Unauthorized", responseCode = "401", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Not Found", responseCode = "404", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Internal Error", responseCode = "500", content = [
+                Content(schema = Schema(implementation = GlobalExceptionHandler::class))
+            ])
+        ]
+    )
     fun createV2(@RequestBody personVOV2: PersonVOV2): PersonVOV2{
         return service.createV2(personVOV2)
     }

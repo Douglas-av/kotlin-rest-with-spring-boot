@@ -1,4 +1,6 @@
 #spring.application.name=kotlin-rest-with-spring-boot
+cors:
+  originPatterns: http://localhost:3000, http://localhost:8080
 server:
   port: 8888
 spring:
