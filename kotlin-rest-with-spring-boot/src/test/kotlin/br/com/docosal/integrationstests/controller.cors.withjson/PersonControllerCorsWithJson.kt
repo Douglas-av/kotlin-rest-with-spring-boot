@@ -63,6 +63,8 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
             content,
             PersonVO::class.java
         )
+        person = createdPerson
+
         Assertions.assertNotNull(createdPerson.id)
         Assertions.assertNotNull(createdPerson.firstName)
         Assertions.assertNotNull(createdPerson.lastName)
@@ -75,6 +77,107 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
         Assertions.assertEquals("Alves", createdPerson.lastName)
         Assertions.assertEquals("SP, SP - Brasil", createdPerson.address)
         Assertions.assertEquals("Male", createdPerson.gender)
+    }
+    @Test
+    @Order(2)
+    fun testCreateWithWrongOrigin() {
+        mockPerson()
+
+        specification = RequestSpecBuilder()
+            .addHeader(
+                TestConfigs.HEADER_PARAM_ORIGIN,
+                TestConfigs.ORIGIN_GOOGLE
+            )
+                .setBasePath("/api/person/v1")
+            .setPort(TestConfigs.SERVER_PORT)
+                .addFilter(RequestLoggingFilter(LogDetail.ALL))
+                .addFilter(ResponseLoggingFilter(LogDetail.ALL))
+            .build()
+
+        val content = RestAssured.given()
+            .spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .body(person)
+                .`when`()
+            .post()
+            .then()
+                .statusCode(403)
+            .extract()
+            .body()
+                .asString()
+
+        Assertions.assertEquals("Invalid CORS request", content)
+    }
+
+    @Test
+    @Order(3)
+    fun testFindById() {
+        mockPerson()
+
+        specification = RequestSpecBuilder()
+            .addHeader(
+                TestConfigs.HEADER_PARAM_ORIGIN,
+                TestConfigs.ORIGIN_LOCAL_HOST
+            )
+                .setBasePath("/api/person/v1")
+            .setPort(TestConfigs.SERVER_PORT)
+                .addFilter(RequestLoggingFilter(LogDetail.ALL))
+                .addFilter(ResponseLoggingFilter(LogDetail.ALL))
+            .build()
+
+        val content = RestAssured.given()
+            .spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .pathParams("id", person.id)
+                .`when`()["{id}"]
+            .then()
+                .statusCode(200)
+            .extract()
+            .body()
+                .asString()
+
+        Assertions.assertNotNull(person.id)
+        Assertions.assertNotNull(person.firstName)
+        Assertions.assertNotNull(person.lastName)
+        Assertions.assertNotNull(person.address)
+        Assertions.assertNotNull(person.gender)
+
+        Assertions.assertTrue(person.id > 0)
+
+        Assertions.assertEquals("Douglas", person.firstName)
+        Assertions.assertEquals("Alves", person.lastName)
+        Assertions.assertEquals("SP, SP - Brasil", person.address)
+        Assertions.assertEquals("Male", person.gender)
+    }
+
+    @Test
+    @Order(2)
+    fun findByIdWithWrongOrigin() {
+        mockPerson()
+
+        specification = RequestSpecBuilder()
+            .addHeader(
+                TestConfigs.HEADER_PARAM_ORIGIN,
+                TestConfigs.ORIGIN_GOOGLE
+            )
+            .setBasePath("/api/person/v1")
+            .setPort(TestConfigs.SERVER_PORT)
+            .addFilter(RequestLoggingFilter(LogDetail.ALL))
+            .addFilter(ResponseLoggingFilter(LogDetail.ALL))
+            .build()
+
+        val content = RestAssured.given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .pathParams("id", person.id)
+            .`when`()["{id}"]
+            .then()
+            .statusCode(403)
+            .extract()
+            .body()
+            .asString()
+
+        Assertions.assertEquals("Invalid CORS request", content)
     }
 
     private fun mockPerson() {

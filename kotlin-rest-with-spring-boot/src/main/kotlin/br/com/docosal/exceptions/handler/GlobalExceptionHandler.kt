@@ -1,6 +1,7 @@
 package br.com.docosal.exceptions.handler
 
 import br.com.docosal.exceptions.ExceptionResponse
+import br.com.docosal.exceptions.InvalidJwtAuthenticationException
 import br.com.docosal.exceptions.ResourceNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -47,5 +48,11 @@ class GlobalExceptionHandler {
     fun handleGenericException(ex: Exception): ResponseEntity<ExceptionResponse> {
         val errorResponse = ExceptionResponse("Erro interno no servidor. ${ex.message}. ${ex.cause}", HttpStatus.INTERNAL_SERVER_ERROR.value() )
         return ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException::class)
+    fun handleInvalidJwtAuthenticationException(ex: Exception) : ResponseEntity<ExceptionResponse>{
+        val errorResponse = ExceptionResponse("", HttpStatus.FORBIDDEN.value())
+        return ResponseEntity(errorResponse, HttpStatus.FORBIDDEN)
     }
 }
