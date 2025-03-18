@@ -1,6 +1,11 @@
 #spring.application.name=kotlin-rest-with-spring-boot
 cors:
   originPatterns: http://localhost:3000, http://localhost:8080
+security:
+  jwt:
+    token:
+      secret-key: admin
+      expire-length: 3600000
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

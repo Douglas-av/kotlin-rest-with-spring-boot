@@ -32,6 +32,7 @@
 		<dozer.version>7.0.0</dozer.version>
 		<testcontainers.version>1.20.6</testcontainers.version>
 		<rest-assured.version>5.5.1</rest-assured.version>
+		<java-jwt.version>4.5.0</java-jwt.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -46,6 +47,17 @@
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>${java-jwt.version}</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
