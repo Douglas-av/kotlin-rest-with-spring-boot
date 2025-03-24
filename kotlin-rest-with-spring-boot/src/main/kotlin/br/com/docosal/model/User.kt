@@ -42,7 +42,7 @@ class User : UserDetails {
     )
     var permissions : List<Permission>? = null
 
-    val role : List<String?> get() {
+    val roles : List<String?> get() {
         val roles : MutableList<String?> = ArrayList()
         for (permission in permissions!!){
             roles.add(permission.description)

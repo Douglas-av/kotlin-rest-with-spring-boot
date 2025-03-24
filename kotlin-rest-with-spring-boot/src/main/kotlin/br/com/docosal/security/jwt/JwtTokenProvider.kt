@@ -55,6 +55,16 @@ class JwtTokenProvider {
             )
     }
 
+    fun refreshToken(refreshToken: String) : TokenDTO {
+        var token: String = ""
+        if (refreshToken.contains("Bearer ")) token = refreshToken.substring("Bearer ".length)
+        val verifier : JWTVerifier = JWT.require(algorithm).build()
+        var decodedJWT : DecodedJWT = verifier.verify(token)
+        val username : String = decodedJWT.subject
+        val roles : List<String> = decodedJWT.getClaim("roles").asList(String::class.java)
+        return createAccessToken(username, roles)
+    }
+
     private fun getAccessToken(username: String, roles: List<String?>, now: Date, validity: Date): String {
         val issuerURL : String = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
         return JWT.create()
@@ -92,7 +102,7 @@ class JwtTokenProvider {
     fun resolveToke(request: HttpServletRequest) : String? {
         val bearerToken = request.getHeader("Authorization")
         return if (!bearerToken.isNullOrBlank() && bearerToken.startsWith("Bearer")) {
-            bearerToken.substring("Bearer".length)
+            bearerToken.substring("Bearer ".length)
          } else null
     }
 
