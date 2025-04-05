@@ -2,6 +2,7 @@ package br.com.docosal.controllers
 
 import br.com.docosal.data.vo.v1.AccountCredentialsDTO
 import br.com.docosal.services.AuthService
+import br.com.docosal.util.MediaType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +19,11 @@ class AuthController {
     lateinit var authService: AuthService
 
     @Operation(summary = "Authenticates an user an return a token")
-    @PostMapping(value = ["/signin"])
+    @PostMapping(
+        value = ["/signin"],
+        consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML, MediaType.APPLICATION_YML_UTF_8],
+        produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML, MediaType.APPLICATION_YML_UTF_8]
+    )
     fun signin(@RequestBody data: AccountCredentialsDTO?): ResponseEntity<*> {
         return if (data!!.username.isNullOrBlank() || data.password.isNullOrBlank())
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Client request! Verificar!")

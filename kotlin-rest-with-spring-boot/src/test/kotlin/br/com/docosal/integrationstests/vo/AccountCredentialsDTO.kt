@@ -1,7 +1,8 @@
 package br.com.docosal.integrationstests.vo
 
-import org.springframework.hateoas.RepresentationModel
+import jakarta.xml.bind.annotation.XmlRootElement
 
+@XmlRootElement
 data class AccountCredentialsDTO (
 
     var username: String? = null,
