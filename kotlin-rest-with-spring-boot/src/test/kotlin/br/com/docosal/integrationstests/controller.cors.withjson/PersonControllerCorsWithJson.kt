@@ -47,16 +47,12 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
             .baseUri(TestConfigs.SERVER_URI)
             .port(TestConfigs.SERVER_PORT)
             .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .header(
-                TestConfigs.HEADER_PARAM_ORIGIN,
-                TestConfigs.ORIGIN_LOCAL_HOST
-            )
             .body(user)
             .`when`()
             .post("/auth/signin")
             .then()
             .log()
-            .ifValidationFails(LogDetail.BODY)
+            .ifValidationFails(LogDetail.ALL)
             .statusCode(200)
             .extract()
             .body()

@@ -35,8 +35,8 @@ class WebConfig : WebMvcConfigurer {
 
     override fun addCorsMappings(registry: CorsRegistry) {
         val allowrdOrigins = corsOriginPatterns.split(",").toTypedArray()
-        registry.addMapping("*")
-            .allowedOrigins("*")
+        registry.addMapping("/**")
+//            .allowedOrigins("*")
             .allowedOrigins(*allowrdOrigins)
             .allowCredentials(true)
     }
