@@ -29,9 +29,9 @@ class AuthService {
     private val logger = Logger.getLogger(BookService::class.java.name)
 
     fun signin(data: AccountCredentialsDTO) : ResponseEntity<*> {
-        logger.info("Trying log user ${data.userName}")
+        logger.info("Trying log user ${data.username}")
         return try {
-            val username = data.userName
+            val username = data.username
             val password = data.password
             authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
             val user = repository.findByUsername(username)

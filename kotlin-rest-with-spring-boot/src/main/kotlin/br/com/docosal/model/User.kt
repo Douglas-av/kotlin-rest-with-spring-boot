@@ -14,7 +14,7 @@ class User : UserDetails {
     var id: Long = 0
 
     @Column(name = "user_name", length = 255, unique = true)
-    var userName: String? = null
+    private var username: String? = null
 
     @Column(name = "full_name", length = 255)
     var fullName: String? = null
@@ -59,7 +59,7 @@ class User : UserDetails {
     }
 
     override fun getUsername(): String {
-        return userName!!
+        return username!!
     }
 
 

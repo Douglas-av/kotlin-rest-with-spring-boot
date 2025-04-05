@@ -4,7 +4,7 @@ import org.springframework.hateoas.RepresentationModel
 
 data class AccountCredentialsDTO (
 
-    var userName: String? = null,
+    var username: String? = null,
 
     var password: String? = null
 )

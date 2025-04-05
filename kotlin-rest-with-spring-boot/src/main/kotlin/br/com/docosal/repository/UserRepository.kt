@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : JpaRepository<User?, Long?> {
 
-    @Query("SELECT u FROM User u WHERE u.userName=:userName")
-    fun findByUsername(@Param("userName") userName: String?) : User?
+    @Query("SELECT u FROM User u WHERE u.username=:username")
+    fun findByUsername(@Param("username") username: String?) : User?
 
 }

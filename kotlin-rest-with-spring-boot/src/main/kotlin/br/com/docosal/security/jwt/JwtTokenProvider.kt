@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
@@ -46,7 +45,7 @@ class JwtTokenProvider {
         val accessToken = getAccessToken(username, roles, now, validity)
         val refreshToken = getRefreshToken(username, roles, now, validity)
         return TokenDTO(
-            userName = username,
+            username = username,
             authenticated = true,
             accessToken = accessToken,
             refreshToken = refreshToken,
