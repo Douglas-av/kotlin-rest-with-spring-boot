@@ -3,6 +3,8 @@ package br.com.docosal.integrationstests.controller.cors.withjson
 import br.com.docosal.integrationstests.TestConfigs
 import br.com.docosal.integrationstests.vo.PersonVO
 import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
+import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
+import br.com.docosal.integrationstests.vo.TokenDTO
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.LogDetail
@@ -23,13 +25,45 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
     private lateinit var specification: RequestSpecification
     private lateinit var objectMapper: ObjectMapper
     private lateinit var person: PersonVO
+    private lateinit var token: String
 
     @BeforeAll
     fun setupTests() {
         objectMapper = ObjectMapper()
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         person = PersonVO()
+        token = ""
     }
+
+    @Test
+    @Order(0)
+    fun authenticate() {
+        var user: AccountCredentialsDTO = AccountCredentialsDTO(
+            username = "Douglas",
+            password = "admin123"
+        )
+
+        token = RestAssured.given()
+            .baseUri(TestConfigs.SERVER_URI)
+            .port(TestConfigs.SERVER_PORT)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .header(
+                TestConfigs.HEADER_PARAM_ORIGIN,
+                TestConfigs.ORIGIN_LOCAL_HOST
+            )
+            .body(user)
+            .`when`()
+            .post("/auth/signin")
+            .then()
+            .log()
+            .ifValidationFails(LogDetail.BODY)
+            .statusCode(200)
+            .extract()
+            .body()
+            .`as`(TokenDTO::class.java)
+            .accessToken!!
+    }
+
 
     @Test
     @Order(1)
@@ -41,23 +75,27 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
                 TestConfigs.HEADER_PARAM_ORIGIN,
                 TestConfigs.ORIGIN_LOCAL_HOST
             )
-                .setBasePath("/api/person/v1")
+            .addHeader(
+                TestConfigs.HEADER_PARAM_AUTHORIZATION,
+                "Bearer $token"
+            )
+            .setBasePath("/api/person/v1")
             .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(ResponseLoggingFilter(LogDetail.ALL))
+            .addFilter(RequestLoggingFilter(LogDetail.ALL))
+            .addFilter(ResponseLoggingFilter(LogDetail.ALL))
             .build()
 
         val content = RestAssured.given()
             .spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
             .body(person)
-                .`when`()
+            .`when`()
             .post()
             .then()
-                .statusCode(200)
+            .statusCode(200)
             .extract()
             .body()
-                .asString()
+            .asString()
 
         val createdPerson = objectMapper.readValue(
             content,
@@ -78,6 +116,7 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
         Assertions.assertEquals("SP, SP - Brasil", createdPerson.address)
         Assertions.assertEquals("Male", createdPerson.gender)
     }
+
     @Test
     @Order(2)
     fun testCreateWithWrongOrigin() {
@@ -88,23 +127,27 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
                 TestConfigs.HEADER_PARAM_ORIGIN,
                 TestConfigs.ORIGIN_GOOGLE
             )
-                .setBasePath("/api/person/v1")
+            .addHeader(
+                TestConfigs.HEADER_PARAM_AUTHORIZATION,
+                "Bearer $token"
+            )
+            .setBasePath("/api/person/v1")
             .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(ResponseLoggingFilter(LogDetail.ALL))
+            .addFilter(RequestLoggingFilter(LogDetail.ALL))
+            .addFilter(ResponseLoggingFilter(LogDetail.ALL))
             .build()
 
         val content = RestAssured.given()
             .spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
             .body(person)
-                .`when`()
+            .`when`()
             .post()
             .then()
-                .statusCode(403)
+            .statusCode(403)
             .extract()
             .body()
-                .asString()
+            .asString()
 
         Assertions.assertEquals("Invalid CORS request", content)
     }
@@ -119,22 +162,26 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
                 TestConfigs.HEADER_PARAM_ORIGIN,
                 TestConfigs.ORIGIN_LOCAL_HOST
             )
-                .setBasePath("/api/person/v1")
+            .addHeader(
+                TestConfigs.HEADER_PARAM_AUTHORIZATION,
+                "Bearer $token"
+            )
+            .setBasePath("/api/person/v1")
             .setPort(TestConfigs.SERVER_PORT)
-                .addFilter(RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(ResponseLoggingFilter(LogDetail.ALL))
+            .addFilter(RequestLoggingFilter(LogDetail.ALL))
+            .addFilter(ResponseLoggingFilter(LogDetail.ALL))
             .build()
 
         val content = RestAssured.given()
             .spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
             .pathParams("id", person.id)
-                .`when`()["{id}"]
+            .`when`()["{id}"]
             .then()
-                .statusCode(200)
+            .statusCode(200)
             .extract()
             .body()
-                .asString()
+            .asString()
 
         Assertions.assertNotNull(person.id)
         Assertions.assertNotNull(person.firstName)
@@ -159,6 +206,10 @@ class PersonControllerCorsWithJson() : AbstractIntegrationTest() {
             .addHeader(
                 TestConfigs.HEADER_PARAM_ORIGIN,
                 TestConfigs.ORIGIN_GOOGLE
+            )
+            .addHeader(
+                TestConfigs.HEADER_PARAM_AUTHORIZATION,
+                "Bearer $token"
             )
             .setBasePath("/api/person/v1")
             .setPort(TestConfigs.SERVER_PORT)
