@@ -1,12 +1,12 @@
-package br.com.docosal.integrationstests.controller.withjson
+package br.com.docosal.integrationstests.controller.withxml
 
 import br.com.docosal.integrationstests.TestConfigs
 import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
-import br.com.docosal.integrationstests.vo.PersonVO
+import br.com.docosal.integrationstests.vo.BookDTO
 import br.com.docosal.integrationstests.vo.TokenDTO
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.LogDetail
@@ -16,23 +16,24 @@ import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.boot.test.context.SpringBootTest
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PersonControllerJsonTest : AbstractIntegrationTest() {
+class BookControllerXmlTest : AbstractIntegrationTest() {
 
 
     private lateinit var specification: RequestSpecification
-    private lateinit var objectMapper: ObjectMapper
-    private lateinit var person: PersonVO
+    private lateinit var objectMapper: XmlMapper
+    private lateinit var bookDTO: BookDTO
 
 
     @BeforeAll
     fun setup() {
-        objectMapper = ObjectMapper()
+        objectMapper = XmlMapper()
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        person = PersonVO()
+        bookDTO = BookDTO()
     }
 
     @Test
@@ -46,7 +47,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         val token = RestAssured.given()
             .baseUri(TestConfigs.SERVER_URI)
             .port(TestConfigs.SERVER_PORT)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
             .body(user)
             .`when`()
             .post("/auth/signin")
@@ -63,7 +64,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
                 "Bearer $token"
             )
             .setPort(TestConfigs.SERVER_PORT)
-            .setBasePath("/api/person/v1")
+            .setBasePath("/api/books/v1")
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
             .addFilter(ResponseLoggingFilter(LogDetail.ALL))
             .build()
@@ -72,13 +73,15 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
 
     @Test
     @Order(1)
-    fun `deve criar uma pessoa nova`() {
-        mockPerson()
+    fun `deve criar um livro novo`() {
+        mockBook()
+        val bookXml = objectMapper.writeValueAsString(bookDTO)
 
         val content = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(person)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .body(bookXml)
             .`when`()
             .post()
             .then()
@@ -87,41 +90,41 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .body()
             .asString()
 
-        val createdPerson = objectMapper.readValue(content, PersonVO::class.java)
+        val createdBook = objectMapper.readValue(content, BookDTO::class.java)
 
-        assertNotNull(createdPerson.id)
-        assertNotNull(createdPerson.firstName)
-        assertNotNull(createdPerson.lastName)
-        assertNotNull(createdPerson.address)
-        assertNotNull(createdPerson.gender)
+        assertNotNull(createdBook.author)
+        assertNotNull(createdBook.title)
+        assertNotNull(createdBook.launchDate)
+        assertNotNull(createdBook.price)
 
-        assertTrue(createdPerson.id > 0)
+        assertTrue(createdBook.key > 0)
 
-        assertEquals("Claudio", createdPerson.firstName)
-        assertEquals("Santos", createdPerson.lastName)
-        assertEquals("Brasil - Brasil", createdPerson.address)
-        assertEquals("Male", createdPerson.gender)
-        person.id = createdPerson.id
+        assertEquals("Machado de Assis", createdBook.author)
+        assertEquals("Memorias postumas de brás cubas", createdBook.title)
+        assertEquals(20.00, createdBook.price)
+        bookDTO = createdBook
 
 
     }
 
-    private fun mockPerson() {
-        person.firstName = "Claudio"
-        person.lastName = "Santos"
-        person.address = "Brasil - Brasil"
-        person.gender = "Male"
-
+    private fun mockBook() {
+        bookDTO.author = "Machado de Assis"
+        bookDTO.title = "Memorias postumas de brás cubas"
+        bookDTO.launchDate = Date()
+        bookDTO.price = 20.00
     }
 
     @Test
     @Order(2)
     fun `deve atualizar as informacoes de uma pessoa`() {
-        person.address = "Sao Paulo - Brasil"
+        bookDTO.title = "Dom Casmurro"
+        val bookXml = objectMapper.writeValueAsString(bookDTO)
+
         var response = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(person)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .body(bookXml)
             .`when`()
             .put()
             .then()
@@ -132,21 +135,20 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .response()
             .asString()
 
-        val updatedPerson = objectMapper.readValue(response, PersonVO::class.java)
+        val updatedBook = objectMapper.readValue(response, BookDTO::class.java)
 
-        assertNotNull(updatedPerson.id)
-        assertNotNull(updatedPerson.firstName)
-        assertNotNull(updatedPerson.lastName)
-        assertNotNull(updatedPerson.address)
-        assertNotNull(updatedPerson.gender)
+        bookDTO = updatedBook
 
-        assertTrue(updatedPerson.id > 0)
+        assertNotNull(updatedBook.author)
+        assertNotNull(updatedBook.title)
+        assertNotNull(updatedBook.launchDate)
+        assertNotNull(updatedBook.price)
 
-        assertEquals("Claudio", updatedPerson.firstName)
-        assertEquals("Santos", updatedPerson.lastName)
-        assertEquals("Sao Paulo - Brasil", updatedPerson.address)
-        assertEquals("Male", updatedPerson.gender)
+        assertTrue(updatedBook.key > 0)
 
+        assertEquals("Machado de Assis", updatedBook.author)
+        assertEquals("Dom Casmurro", updatedBook.title)
+        assertEquals(20.00, updatedBook.price)
 
     }
 
@@ -155,8 +157,9 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     fun `deve retornar a pessoa cadastrada`() {
         var response = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .pathParams("id", person.id)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .pathParams("id", bookDTO.key)
             .`when`()
             .get("{id}")
             .then()
@@ -167,21 +170,18 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .response()
             .asString()
 
-        val createdPerson = objectMapper.readValue(response, PersonVO::class.java)
-        println(createdPerson)
+        val createdBook = objectMapper.readValue(response, BookDTO::class.java)
 
-        assertNotNull(createdPerson.id)
-        assertNotNull(createdPerson.firstName)
-        assertNotNull(createdPerson.lastName)
-        assertNotNull(createdPerson.address)
-        assertNotNull(createdPerson.gender)
+        assertNotNull(createdBook.author)
+        assertNotNull(createdBook.title)
+        assertNotNull(createdBook.launchDate)
+        assertNotNull(createdBook.price)
 
-        assertTrue(createdPerson.id > 0)
+        assertTrue(createdBook.key > 0)
 
-        assertEquals("Claudio", createdPerson.firstName)
-        assertEquals("Santos", createdPerson.lastName)
-        assertEquals("Sao Paulo - Brasil", createdPerson.address)
-        assertEquals("Male", createdPerson.gender)
+        assertEquals("Machado de Assis", createdBook.author)
+        assertEquals("Dom Casmurro", createdBook.title)
+        assertEquals(20.00, createdBook.price)
     }
 
     @Test
@@ -189,7 +189,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     fun `deve deletar uma pessoa`() {
         RestAssured.given()
             .spec(specification)
-            .pathParams("id", person.id)
+            .pathParams("id", bookDTO.key)
             .`when`()
             .delete("{id}")
             .then()
@@ -202,7 +202,8 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     fun `deve retornar todas as pessoas cadastradas`() {
         var response = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
             .`when`()
             .get()
             .then()
@@ -211,22 +212,21 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .response()
             .asString()
 
-        val persons = objectMapper.readValue(response, Array<PersonVO>::class.java)
+        val books = objectMapper.readValue(response, Array<BookDTO>::class.java)
 
-        var personOne = persons[0]
+        var bookOne = books[0]
 
-        assertNotNull(personOne.id)
-        assertNotNull(personOne.firstName)
-        assertNotNull(personOne.lastName)
-        assertNotNull(personOne.address)
-        assertNotNull(personOne.gender)
+        assertNotNull(bookOne.key)
+        assertNotNull(bookOne.author)
+        assertNotNull(bookOne.launchDate)
+        assertNotNull(bookOne.price)
+        assertNotNull(bookOne.title)
 
-        assertTrue(personOne.id > 0)
+        assertTrue(bookOne.key > 0)
 
-        assertEquals("Douglas", personOne.firstName)
-        assertEquals("Costa", personOne.lastName)
-        assertEquals("Itaquaquecetuba - SP - Brasil", personOne.address)
-        assertEquals("Male", personOne.gender)
+        assertEquals("Michael C. Feathers", bookOne.author)
+        assertEquals("Working effectively with legacy code", bookOne.title)
+        assertEquals(49.00, bookOne.price)
     }
 
     @Test
@@ -234,14 +234,14 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     fun `deve retornar acesso negado - FindAll sem token`() {
         var specificationWithoutToken = RequestSpecBuilder()
             .setPort(TestConfigs.SERVER_PORT)
-            .setBasePath("/api/person/v1")
+            .setBasePath("/api/books/v1")
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
             .addFilter(ResponseLoggingFilter(LogDetail.ALL))
             .build()
 
         RestAssured.given()
             .spec(specificationWithoutToken)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
             .`when`()
             .get()
             .then()

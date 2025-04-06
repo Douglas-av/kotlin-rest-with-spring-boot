@@ -32,7 +32,7 @@ class BookController {
     @Autowired
     private lateinit var service: BookService
 
-    @GetMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML])
+    @GetMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Find All Books", description = "Find All Books",
         tags = ["Books"],
         responses = [
@@ -60,7 +60,7 @@ class BookController {
         return  service.findAll()
     }
 
-    @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML])
+    @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Finds a Book by ID", description = "Finds a Book by ID",
         tags = ["Books"],
         responses = [
@@ -88,8 +88,8 @@ class BookController {
         return  service.findById(id)
     }
 
-    @PostMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML],
-        consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML])
+    @PostMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML],
+        consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Creates a new Book", description = "Creates a new Book",
         tags = ["Books"],
         responses = [
@@ -117,8 +117,8 @@ class BookController {
         return service.create(book)
     }
 
-    @PutMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML],
-        consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML])
+    @PutMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML],
+        consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Updates a new Book", description = "Updates a new Book",
         tags = ["Books"],
         responses = [
@@ -147,8 +147,7 @@ class BookController {
     }
 
 
-    @DeleteMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML],
-        consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_XML])
+    @DeleteMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML],)
     @Operation(summary = "Delete a new Book", description = "Delete a new Book",
         tags = ["Books"],
         responses = [

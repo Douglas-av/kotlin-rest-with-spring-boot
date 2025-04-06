@@ -1,7 +1,9 @@
 package br.com.docosal.integrationstests.vo
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.xml.bind.annotation.XmlRootElement
 
+@XmlRootElement
 data class PersonVO (
 
     var id: Long = 0,

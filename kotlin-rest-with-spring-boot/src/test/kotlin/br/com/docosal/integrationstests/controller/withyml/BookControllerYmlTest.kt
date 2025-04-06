@@ -1,6 +1,7 @@
-package br.com.docosal.integrationstests.controller.withjson
+package br.com.docosal.integrationstests.controller.withyml
 
 import br.com.docosal.integrationstests.TestConfigs
+import br.com.docosal.integrationstests.controller.withyml.mapper.YMLMapper
 import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
 import br.com.docosal.integrationstests.vo.BookDTO
@@ -9,9 +10,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
+import io.restassured.config.EncoderConfig
+import io.restassured.config.RestAssuredConfig
 import io.restassured.filter.log.LogDetail
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
+import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -21,18 +25,17 @@ import java.util.Date
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BookControllerJsonTest : AbstractIntegrationTest() {
+class BookControllerYmlTest : AbstractIntegrationTest() {
 
 
     private lateinit var specification: RequestSpecification
-    private lateinit var objectMapper: ObjectMapper
+    private lateinit var objectMapper: YMLMapper
     private lateinit var bookDTO: BookDTO
 
 
     @BeforeAll
     fun setup() {
-        objectMapper = ObjectMapper()
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        objectMapper = YMLMapper()
         bookDTO = BookDTO()
     }
 
@@ -45,10 +48,14 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
         )
 
         val token = RestAssured.given()
+            .config(
+                RestAssuredConfig.config()
+                    .encoderConfig(EncoderConfig().encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT))
+            )
             .baseUri(TestConfigs.SERVER_URI)
             .port(TestConfigs.SERVER_PORT)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(user)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .body(user, objectMapper)
             .`when`()
             .post("/auth/signin")
             .then()
@@ -63,6 +70,15 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
                 TestConfigs.HEADER_PARAM_AUTHORIZATION,
                 "Bearer $token"
             )
+            .setConfig(
+                RestAssuredConfig.config()
+                    .encoderConfig(
+                        EncoderConfig()
+                            .encodeContentTypeAs(
+                                TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT
+                            )
+                    )
+            )
             .setPort(TestConfigs.SERVER_PORT)
             .setBasePath("/api/books/v1")
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
@@ -76,19 +92,18 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
     fun `deve criar uma pessoa nova`() {
         mockBook()
 
-        val content = RestAssured.given()
+        val createdBook = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(bookDTO)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .body(bookDTO, objectMapper)
             .`when`()
             .post()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .asString()
+            .`as`(BookDTO::class.java, objectMapper)
 
-        val createdBook = objectMapper.readValue(content, BookDTO::class.java)
 
         assertNotNull(createdBook.author)
         assertNotNull(createdBook.title)
@@ -115,10 +130,10 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
     @Order(2)
     fun `deve atualizar as informacoes de uma pessoa`() {
         bookDTO.title = "Dom Casmurro"
-        var response = RestAssured.given()
+        var updatedBook = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(bookDTO)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .body(bookDTO, objectMapper)
             .`when`()
             .put()
             .then()
@@ -127,9 +142,8 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
             .statusCode(200)
             .extract()
             .response()
-            .asString()
+            .`as`(BookDTO::class.java, objectMapper)
 
-        val updatedBook = objectMapper.readValue(response, BookDTO::class.java)
 
         assertNotNull(updatedBook.author)
         assertNotNull(updatedBook.title)
@@ -148,9 +162,9 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
     @Test
     @Order(3)
     fun `deve retornar a pessoa cadastrada`() {
-        var response = RestAssured.given()
+        var createdBook = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .pathParams("id", bookDTO.key)
             .`when`()
             .get("{id}")
@@ -160,9 +174,7 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
             .statusCode(200)
             .extract()
             .response()
-            .asString()
-
-        val createdBook = objectMapper.readValue(response, BookDTO::class.java)
+            .`as`(BookDTO::class.java, objectMapper)
 
         assertNotNull(createdBook.author)
         assertNotNull(createdBook.title)
@@ -192,18 +204,16 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
     @Test
     @Order(5)
     fun `deve retornar todas as pessoas cadastradas`() {
-        var response = RestAssured.given()
+        var books = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .`when`()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .response()
-            .asString()
-
-        val books = objectMapper.readValue(response, Array<BookDTO>::class.java)
+            .`as`(Array<BookDTO>::class.java, objectMapper)
 
         var bookOne = books[0]
 
@@ -224,6 +234,15 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
     @Order(5)
     fun `deve retornar acesso negado - FindAll sem token`() {
         var specificationWithoutToken = RequestSpecBuilder()
+            .setConfig(
+                RestAssuredConfig.config()
+                    .encoderConfig(
+                        EncoderConfig()
+                            .encodeContentTypeAs(
+                                TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT
+                            )
+                    )
+            )
             .setPort(TestConfigs.SERVER_PORT)
             .setBasePath("/api/books/v1")
             .addFilter(RequestLoggingFilter(LogDetail.ALL))
@@ -232,7 +251,7 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
 
         RestAssured.given()
             .spec(specificationWithoutToken)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .`when`()
             .get()
             .then()

@@ -50,6 +50,7 @@ class BookService {
 
     fun create(bookDTO: BookDTO?): BookDTO{
         if (bookDTO == null) throw  RequiredObjectIsNullException()
+        logger.info("Creating one book with title ${bookDTO.title}")
         var book : Book = DozerMapper.parseObject(bookDTO, Book::class.java)
         var bookDTOCreated =  DozerMapper.parseObject(repository.save(book), BookDTO::class.java)
         val withSelfRel = linkTo(BookController::class.java).slash(bookDTOCreated.key).withSelfRel()

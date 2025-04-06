@@ -1,6 +1,7 @@
-package br.com.docosal.integrationstests.controller.withjson
+package br.com.docosal.integrationstests.controller.withyml
 
 import br.com.docosal.integrationstests.TestConfigs
+import br.com.docosal.integrationstests.controller.withyml.mapper.YMLMapper
 import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
 import br.com.docosal.integrationstests.vo.PersonVO
@@ -9,9 +10,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
+import io.restassured.config.EncoderConfig
+import io.restassured.config.RestAssuredConfig
 import io.restassured.filter.log.LogDetail
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
+import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -20,19 +24,18 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PersonControllerJsonTest : AbstractIntegrationTest() {
+class PersonControllerYmlTest : AbstractIntegrationTest() {
 
 
     private lateinit var specification: RequestSpecification
-    private lateinit var objectMapper: ObjectMapper
+    private lateinit var objectMapper: YMLMapper
     private lateinit var person: PersonVO
 
 
     @BeforeAll
     fun setup() {
-        objectMapper = ObjectMapper()
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         person = PersonVO()
+        objectMapper = YMLMapper()
     }
 
     @Test
@@ -44,23 +47,42 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         )
 
         val token = RestAssured.given()
-            .baseUri(TestConfigs.SERVER_URI)
+            .config(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(
+                        EncoderConfig.encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false)
+                            .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT)
+                    )
+            )
+            .basePath("/auth/signin")
             .port(TestConfigs.SERVER_PORT)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(user)
+            .accept(TestConfigs.CONTENT_TYPE_YML)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .body(user, objectMapper)
+            .log()
+            .ifValidationFails(LogDetail.ALL)
             .`when`()
-            .post("/auth/signin")
+            .post()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .`as`(TokenDTO::class.java)
+            .`as`(TokenDTO::class.java, objectMapper)
             .accessToken!!
 
         specification = RequestSpecBuilder()
             .addHeader(
                 TestConfigs.HEADER_PARAM_AUTHORIZATION,
                 "Bearer $token"
+            )
+            .setConfig(
+                RestAssuredConfig
+                    .config()
+                    .encoderConfig(
+                        EncoderConfig.encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false)
+                            .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT)
+                    )
             )
             .setPort(TestConfigs.SERVER_PORT)
             .setBasePath("/api/person/v1")
@@ -75,19 +97,17 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     fun `deve criar uma pessoa nova`() {
         mockPerson()
 
-        val content = RestAssured.given()
+        val createdPerson = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(person)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .body(person, objectMapper)
             .`when`()
             .post()
             .then()
             .statusCode(200)
             .extract()
             .body()
-            .asString()
-
-        val createdPerson = objectMapper.readValue(content, PersonVO::class.java)
+            .`as`(PersonVO::class.java, objectMapper)
 
         assertNotNull(createdPerson.id)
         assertNotNull(createdPerson.firstName)
@@ -101,7 +121,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals("Santos", createdPerson.lastName)
         assertEquals("Brasil - Brasil", createdPerson.address)
         assertEquals("Male", createdPerson.gender)
-        person.id = createdPerson.id
+        person = createdPerson
 
 
     }
@@ -118,10 +138,10 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     @Order(2)
     fun `deve atualizar as informacoes de uma pessoa`() {
         person.address = "Sao Paulo - Brasil"
-        var response = RestAssured.given()
+        var updatedPerson = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
-            .body(person)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .body(person, objectMapper)
             .`when`()
             .put()
             .then()
@@ -130,9 +150,8 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .statusCode(200)
             .extract()
             .response()
-            .asString()
+            .`as`(PersonVO::class.java, objectMapper)
 
-        val updatedPerson = objectMapper.readValue(response, PersonVO::class.java)
 
         assertNotNull(updatedPerson.id)
         assertNotNull(updatedPerson.firstName)
@@ -153,9 +172,9 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     @Test
     @Order(3)
     fun `deve retornar a pessoa cadastrada`() {
-        var response = RestAssured.given()
+        var createdPerson = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .pathParams("id", person.id)
             .`when`()
             .get("{id}")
@@ -165,10 +184,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .statusCode(200)
             .extract()
             .response()
-            .asString()
-
-        val createdPerson = objectMapper.readValue(response, PersonVO::class.java)
-        println(createdPerson)
+            .`as`(PersonVO::class.java, objectMapper)
 
         assertNotNull(createdPerson.id)
         assertNotNull(createdPerson.firstName)
@@ -200,18 +216,17 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     @Test
     @Order(5)
     fun `deve retornar todas as pessoas cadastradas`() {
-        var response = RestAssured.given()
+        var persons = RestAssured.given()
             .spec(specification)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .`when`()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .response()
-            .asString()
+            .`as`(Array<PersonVO>::class.java, objectMapper)
 
-        val persons = objectMapper.readValue(response, Array<PersonVO>::class.java)
 
         var personOne = persons[0]
 
@@ -241,7 +256,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
 
         RestAssured.given()
             .spec(specificationWithoutToken)
-            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
             .`when`()
             .get()
             .then()

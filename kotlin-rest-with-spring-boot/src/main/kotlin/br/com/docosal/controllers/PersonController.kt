@@ -164,7 +164,7 @@ class PersonController {
         return service.createV2(personVOV2)
     }
 
-    @PutMapping(consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML],
+    @PutMapping(consumes = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML],
         produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Updates a person`s information", description = "Updates a person`s information",
         tags = ["People"],
