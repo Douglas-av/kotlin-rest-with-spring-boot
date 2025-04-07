@@ -193,6 +193,34 @@ class PersonController {
         return service.update(personVO)
     }
 
+    @Operation(summary = "Disable a Person By ID", description = "Disable a Person By ID",
+        tags = ["People"],
+        responses = [
+            ApiResponse(description = "Success", responseCode = "200", content = [
+                Content(schema = Schema(implementation = PersonVO::class))
+            ]),
+            ApiResponse(description = "No Content", responseCode = "204", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Bad Request", responseCode = "400", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Unauthorized", responseCode = "401", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Not Found", responseCode = "404", content = [
+                Content(schema = Schema(implementation = Unit::class))
+            ]),
+            ApiResponse(description = "Internal Error", responseCode = "500", content = [
+                Content(schema = Schema(implementation = GlobalExceptionHandler::class))
+            ])
+        ]
+    )
+    @PatchMapping(value=["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
+    fun disablePerson(@PathVariable(value="id") id: Long): PersonVO{
+        return service.disablePerson(id)
+    }
+
     @DeleteMapping(value=["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Deletes a Person", description = "Deletes a Person",
         tags = ["People"],

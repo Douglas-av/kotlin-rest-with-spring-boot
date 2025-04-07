@@ -72,7 +72,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
 
     @Test
     @Order(1)
-    fun `deve criar uma pessoa nova`() {
+    fun `CREATE deve criar uma pessoa nova`() {
         mockPerson()
 
         val content = RestAssured.given()
@@ -101,6 +101,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals("Santos", createdPerson.lastName)
         assertEquals("Brasil - Brasil", createdPerson.address)
         assertEquals("Male", createdPerson.gender)
+        assertEquals(true, createdPerson.enabled)
         person.id = createdPerson.id
 
 
@@ -111,12 +112,12 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         person.lastName = "Santos"
         person.address = "Brasil - Brasil"
         person.gender = "Male"
-
+        person.enabled = true
     }
 
     @Test
     @Order(2)
-    fun `deve atualizar as informacoes de uma pessoa`() {
+    fun `PUT deve atualizar as informacoes de uma pessoa`() {
         person.address = "Sao Paulo - Brasil"
         var response = RestAssured.given()
             .spec(specification)
@@ -146,13 +147,51 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals("Santos", updatedPerson.lastName)
         assertEquals("Sao Paulo - Brasil", updatedPerson.address)
         assertEquals("Male", updatedPerson.gender)
+        assertEquals(true, updatedPerson.enabled)
 
 
     }
 
     @Test
     @Order(3)
-    fun `deve retornar a pessoa cadastrada`() {
+    fun `PATCH deve desabilitar uma pessoa`() {
+        var response = RestAssured.given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .pathParams("id", person.id)
+            .`when`()
+            .patch("{id}")
+            .then()
+            .log()
+            .all()
+            .statusCode(200)
+            .extract()
+            .response()
+            .asString()
+
+        val updatedPerson = objectMapper.readValue(response, PersonVO::class.java)
+
+        assertNotNull(updatedPerson.id)
+        assertNotNull(updatedPerson.firstName)
+        assertNotNull(updatedPerson.lastName)
+        assertNotNull(updatedPerson.address)
+        assertNotNull(updatedPerson.gender)
+        assertNotNull(updatedPerson.enabled)
+
+        assertTrue(updatedPerson.id > 0)
+
+        assertEquals("Claudio", updatedPerson.firstName)
+        assertEquals("Santos", updatedPerson.lastName)
+        assertEquals("Sao Paulo - Brasil", updatedPerson.address)
+        assertEquals("Male", updatedPerson.gender)
+        assertEquals(false, updatedPerson.enabled)
+
+
+    }
+
+    @Test
+    @Order(4)
+    fun `GET deve retornar a pessoa cadastrada`() {
         var response = RestAssured.given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_JSON)
@@ -182,11 +221,12 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals("Santos", createdPerson.lastName)
         assertEquals("Sao Paulo - Brasil", createdPerson.address)
         assertEquals("Male", createdPerson.gender)
+        assertEquals(false, createdPerson.enabled)
     }
 
     @Test
-    @Order(4)
-    fun `deve deletar uma pessoa`() {
+    @Order(5)
+    fun `DELETE deve deletar uma pessoa`() {
         RestAssured.given()
             .spec(specification)
             .pathParams("id", person.id)
@@ -198,8 +238,8 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     }
 
     @Test
-    @Order(5)
-    fun `deve retornar todas as pessoas cadastradas`() {
+    @Order(6)
+    fun `GET deve retornar todas as pessoas cadastradas`() {
         var response = RestAssured.given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_JSON)
@@ -227,10 +267,11 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertEquals("Costa", personOne.lastName)
         assertEquals("Itaquaquecetuba - SP - Brasil", personOne.address)
         assertEquals("Male", personOne.gender)
+        assertEquals(true, personOne.enabled)
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     fun `deve retornar acesso negado - FindAll sem token`() {
         var specificationWithoutToken = RequestSpecBuilder()
             .setPort(TestConfigs.SERVER_PORT)

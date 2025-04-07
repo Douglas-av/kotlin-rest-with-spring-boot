@@ -73,7 +73,7 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(1)
-    fun `deve criar uma pessoa nova`() {
+    fun `CREATE deve criar uma pessoa nova`() {
         mockPerson()
         val personXml = objectMapper.writeValueAsString(person)
 
@@ -114,11 +114,12 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
         person.lastName = "Santos"
         person.address = "Brasil - Brasil"
         person.gender = "Male"
+        person.enabled = true
     }
 
     @Test
     @Order(2)
-    fun `deve atualizar as informacoes de uma pessoa`() {
+    fun `PUT deve atualizar as informacoes de uma pessoa`() {
         person.address = "Sao Paulo - Brasil"
         val personXml = objectMapper.writeValueAsString(person)
 
@@ -159,7 +160,47 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(3)
-    fun `deve retornar a pessoa cadastrada`() {
+    fun `PATCH deve desabilitar uma pessoa`() {
+        val personXml = objectMapper.writeValueAsString(person)
+
+        var response = RestAssured.given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_XML)
+            .accept(TestConfigs.CONTENT_TYPE_XML)
+            .pathParams("id", person.id)
+            .`when`()
+            .patch("{id}")
+            .then()
+            .log()
+            .all()
+            .statusCode(200)
+            .extract()
+            .response()
+            .asString()
+
+        val updatedPerson = objectMapper.readValue(response, PersonVO::class.java)
+
+        person = updatedPerson
+
+        assertNotNull(updatedPerson.id)
+        assertNotNull(updatedPerson.firstName)
+        assertNotNull(updatedPerson.lastName)
+        assertNotNull(updatedPerson.address)
+        assertNotNull(updatedPerson.gender)
+
+        assertTrue(updatedPerson.id > 0)
+
+        assertEquals("Claudio", updatedPerson.firstName)
+        assertEquals("Santos", updatedPerson.lastName)
+        assertEquals("Sao Paulo - Brasil", updatedPerson.address)
+        assertEquals("Male", updatedPerson.gender)
+        assertEquals(false, updatedPerson.enabled)
+
+    }
+
+    @Test
+    @Order(4)
+    fun `GET deve retornar a pessoa cadastrada`() {
         var response = RestAssured.given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_XML)
@@ -189,10 +230,12 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
         assertEquals("Santos", createdPerson.lastName)
         assertEquals("Sao Paulo - Brasil", createdPerson.address)
         assertEquals("Male", createdPerson.gender)
+        assertEquals(false, createdPerson.enabled)
+
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun `deve deletar uma pessoa`() {
         RestAssured.given()
             .spec(specification)
@@ -205,7 +248,7 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     fun `deve retornar todas as pessoas cadastradas`() {
         var response = RestAssured.given()
             .spec(specification)
@@ -235,11 +278,12 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
         assertEquals("Costa", personOne.lastName)
         assertEquals("Itaquaquecetuba - SP - Brasil", personOne.address)
         assertEquals("Male", personOne.gender)
+        assertEquals(true, personOne.enabled)
     }
 
     @Test
-    @Order(5)
-    fun `deve retornar acesso negado - FindAll sem token`() {
+    @Order(7)
+    fun `GET deve retornar acesso negado - FindAll sem token`() {
         var specificationWithoutToken = RequestSpecBuilder()
             .setPort(TestConfigs.SERVER_PORT)
             .setBasePath("/api/person/v1")
