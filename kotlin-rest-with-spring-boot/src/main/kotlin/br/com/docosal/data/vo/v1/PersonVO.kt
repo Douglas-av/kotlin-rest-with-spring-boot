@@ -1,12 +1,11 @@
 package br.com.docosal.data.vo.v1
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.github.dozermapper.core.Mapping
 import org.springframework.hateoas.RepresentationModel
 
-@JsonPropertyOrder("id", "address", "first_name", "last_name", "gender", "enabled")
+@JsonPropertyOrder("id", "first_name", "address", "last_name", "gender", "enabled")
 data class PersonVO (
 
     @Mapping("id")

@@ -12,6 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.hateoas.EntityModel
+import org.springframework.hateoas.PagedModel
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -56,8 +61,14 @@ class BookController {
             ])
         ]
     )
-    fun findAll(): List<BookDTO>{
-        return  service.findAll()
+    fun findAll(
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "12") size: Int,
+        @RequestParam("direction", defaultValue = "desc") direction: String,
+    ): ResponseEntity<PagedModel<EntityModel<BookDTO>>>{
+        var sortDirection : Sort.Direction = if ("desc".equals(direction, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
+        var pageable : Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "title"))
+        return  ResponseEntity.ok(service.findAll(pageable))
     }
 
     @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])

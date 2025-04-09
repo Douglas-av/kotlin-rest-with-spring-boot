@@ -9,9 +9,13 @@ import br.com.docosal.mapper.custom.BookMapper
 import br.com.docosal.model.Book
 import br.com.docosal.repository.BookRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.web.PagedResourcesAssembler
+import org.springframework.hateoas.EntityModel
+import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
+import org.springframework.data.domain.Pageable
 
 @Service
 class BookService {
@@ -20,22 +24,19 @@ class BookService {
     lateinit var repository: BookRepository
 
     @Autowired
+    lateinit var assembler: PagedResourcesAssembler<BookDTO>
+
+    @Autowired
     lateinit var mapper : BookMapper
 
     private val logger = Logger.getLogger(BookService::class.java.name)
 
-    fun findAll(): List<BookDTO> {
+    fun findAll(pageable: Pageable): PagedModel<EntityModel<BookDTO>> {
         logger.info("Finding all books!")
-        var books: List<Book> = repository.findAll()
-        var booksDTO: ArrayList<BookDTO> = DozerMapper.parseListObjects(books, BookDTO::class.java)
-//        for (book in books){
-//            bookDTO.add(mapper.mapToBookDTO(book))
-//        }
-        for (bookDTO in booksDTO){
-            val withSelfRel = linkTo(BookController::class.java).slash(bookDTO.key).withSelfRel()
-            bookDTO.add(withSelfRel)
-        }
-        return booksDTO
+        var books = repository.findAll(pageable)
+        var booksDTO = books.map { b -> DozerMapper.parseObject(b, BookDTO::class.java) }
+        booksDTO.map { b -> b.add(linkTo(BookController::class.java).slash(b.key).withSelfRel()) }
+        return assembler.toModel(booksDTO)
     }
 
     fun findById(id : Long): BookDTO {
