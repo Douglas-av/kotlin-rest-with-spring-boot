@@ -6,6 +6,7 @@ import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
 import br.com.docosal.integrationstests.vo.PersonVO
 import br.com.docosal.integrationstests.vo.TokenDTO
+import br.com.docosal.integrationstests.vo.wrappers.WrapperPersonVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -40,7 +41,7 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(0)
-    fun `deve autenticar e gerar o jwt Token`() {
+    fun `POST deve autenticar e gerar o jwt Token`() {
         var user: AccountCredentialsDTO = AccountCredentialsDTO(
             username = "Douglas",
             password = "admin123"
@@ -239,7 +240,7 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(5)
-    fun `deve deletar uma pessoa`() {
+    fun `DELETE deve deletar uma pessoa`() {
         RestAssured.given()
             .spec(specification)
             .pathParams("id", person.id)
@@ -252,22 +253,25 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
 
     @Test
     @Order(6)
-    fun `deve retornar todas as pessoas cadastradas`() {
-        var persons = RestAssured.given()
+    fun `GET deve retornar todas as pessoas cadastradas`() {
+        var wrapper = RestAssured.given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .queryParams("page", 3, "size", 12, "direction", "asc")
             .`when`()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .response()
-            .`as`(Array<PersonVO>::class.java, objectMapper)
+            .`as`(WrapperPersonVO::class.java, objectMapper)
 
 
-        var personOne = persons[0]
+        val persons = wrapper.embeded!!.persons
 
-        assertNotNull(personOne.id)
+        var personOne = persons?.get(0)
+
+        assertNotNull(personOne!!.id)
         assertNotNull(personOne.firstName)
         assertNotNull(personOne.lastName)
         assertNotNull(personOne.address)
@@ -275,11 +279,11 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
 
         assertTrue(personOne.id > 0)
 
-        assertEquals("Douglas", personOne.firstName)
-        assertEquals("Costa", personOne.lastName)
-        assertEquals("Itaquaquecetuba - SP - Brasil", personOne.address)
+        assertEquals("Allin", personOne.firstName)
+        assertEquals("Emmot", personOne.lastName)
+        assertEquals("7913 Lindbergh Way", personOne.address)
         assertEquals("Male", personOne.gender)
-        assertEquals(true, personOne.enabled)
+        assertEquals(false, personOne.enabled)
     }
 
     @Test
@@ -303,6 +307,74 @@ class PersonControllerYmlTest : AbstractIntegrationTest() {
             .response()
             .asString()
 
+    }
+
+    @Test
+    @Order(8)
+    fun `GET deve retornar todas as pessoas cadastradas que contem a string especifica no nome`() {
+        var wrapper = RestAssured.given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .pathParam("firstName", "doug")
+            .queryParams("page", 0, "size", 12, "direction", "asc")
+            .`when`()
+            .get("findPersonByName/{firstName}")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response()
+            .`as`(WrapperPersonVO::class.java, objectMapper)
+
+
+        val persons = wrapper.embeded!!.persons
+
+        var personOne = persons?.get(0)
+
+        assertNotNull(personOne!!.id)
+        assertNotNull(personOne.firstName)
+        assertNotNull(personOne.lastName)
+        assertNotNull(personOne.address)
+        assertNotNull(personOne.gender)
+
+        assertTrue(personOne.id > 0)
+
+        assertEquals("Douglas", personOne.firstName)
+        assertEquals("Costa", personOne.lastName)
+        assertEquals("Itaquaquecetuba - SP - Brasil", personOne.address)
+        assertEquals("Male", personOne.gender)
+        assertEquals(true, personOne.enabled)
+    }
+
+    @Test
+    @Order(9)
+    fun testHATEOAS() {
+        val content = RestAssured.given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .queryParams(
+                "page", 3,
+                "size",12,
+                "direction", "asc")
+            .`when`()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/799"}}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/201"}}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/947"}}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/571"}}}"""))
+
+        assertTrue(content.contains("""{"first":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=0&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","prev":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=2&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","self":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=3&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","next":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=4&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","last":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=83&size=12&sort=firstName,asc"}"""))
+
+        assertTrue(content.contains(""""page":{"size":12,"totalElements":1005,"totalPages":84,"number":3}}"""))
     }
 
 }

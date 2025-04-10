@@ -5,6 +5,7 @@ import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
 import br.com.docosal.integrationstests.vo.BookDTO
 import br.com.docosal.integrationstests.vo.TokenDTO
+import br.com.docosal.integrationstests.vo.wrappers.WrapperBookDTO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -195,6 +196,7 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
         var response = RestAssured.given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .queryParams("page", 1, "size", 12, "direction", "asc")
             .`when`()
             .get()
             .then()
@@ -203,11 +205,12 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
             .response()
             .asString()
 
-        val books = objectMapper.readValue(response, Array<BookDTO>::class.java)
+        val wrapper = objectMapper.readValue(response, WrapperBookDTO::class.java)
+        val books = wrapper.embeded!!.books
 
-        var bookOne = books[0]
+        var bookOne = books?.get(0)
 
-        assertNotNull(bookOne.key)
+        assertNotNull(bookOne!!.key)
         assertNotNull(bookOne.author)
         assertNotNull(bookOne.launchDate)
         assertNotNull(bookOne.price)
@@ -215,9 +218,9 @@ class BookControllerJsonTest : AbstractIntegrationTest() {
 
         assertTrue(bookOne.key > 0)
 
-        assertEquals("Michael C. Feathers", bookOne.author)
-        assertEquals("Working effectively with legacy code", bookOne.title)
-        assertEquals(49.00, bookOne.price)
+        assertEquals("Marc J. Schiller", bookOne.author)
+        assertEquals("Os 11 segredos de líderes de TI altamente influentes", bookOne.title)
+        assertEquals(45.00, bookOne.price)
     }
 
     @Test

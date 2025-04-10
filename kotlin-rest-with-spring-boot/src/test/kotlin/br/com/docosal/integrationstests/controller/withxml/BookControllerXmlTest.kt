@@ -5,6 +5,7 @@ import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
 import br.com.docosal.integrationstests.vo.BookDTO
 import br.com.docosal.integrationstests.vo.TokenDTO
+import br.com.docosal.integrationstests.vo.wrappers.WrapperBookDTO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import io.restassured.RestAssured
@@ -204,6 +205,7 @@ class BookControllerXmlTest : AbstractIntegrationTest() {
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_XML)
             .accept(TestConfigs.CONTENT_TYPE_XML)
+            .queryParams("page", 1, "size", 12, "direction", "asc")
             .`when`()
             .get()
             .then()
@@ -212,11 +214,12 @@ class BookControllerXmlTest : AbstractIntegrationTest() {
             .response()
             .asString()
 
-        val books = objectMapper.readValue(response, Array<BookDTO>::class.java)
+        val wrapper = objectMapper.readValue(response, WrapperBookDTO::class.java)
+        val books = wrapper.content
 
-        var bookOne = books[0]
+        var bookOne = books?.get(0)
 
-        assertNotNull(bookOne.key)
+        assertNotNull(bookOne!!.key)
         assertNotNull(bookOne.author)
         assertNotNull(bookOne.launchDate)
         assertNotNull(bookOne.price)
@@ -224,13 +227,13 @@ class BookControllerXmlTest : AbstractIntegrationTest() {
 
         assertTrue(bookOne.key > 0)
 
-        assertEquals("Michael C. Feathers", bookOne.author)
-        assertEquals("Working effectively with legacy code", bookOne.title)
-        assertEquals(49.00, bookOne.price)
+        assertEquals("Marc J. Schiller", bookOne.author)
+        assertEquals("Os 11 segredos de líderes de TI altamente influentes", bookOne.title)
+        assertEquals(45.00, bookOne.price)
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     fun `deve retornar acesso negado - FindAll sem token`() {
         var specificationWithoutToken = RequestSpecBuilder()
             .setPort(TestConfigs.SERVER_PORT)

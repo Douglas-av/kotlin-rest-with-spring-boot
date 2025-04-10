@@ -2,6 +2,10 @@ package br.com.docosal.unittests.mocks
 
 import br.com.docosal.data.vo.v1.BookDTO
 import br.com.docosal.model.Book
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MockBook {
     fun mockEntity(): Book {
@@ -14,6 +18,7 @@ class MockBook {
         book.title = "Title test $number"
         book.id = number.toLong()
         book.price = 25.0
+        book.launchDate = Date.from(LocalDate.of(2025, 4, 10).atStartOfDay(ZoneId.systemDefault()).toInstant())
         return book
     }
 
@@ -35,6 +40,7 @@ class MockBook {
         book.title = "Title test $number"
         book.key = number.toLong()
         book.price = 25.0
+        book.launchDate = Date.from(LocalDate.of(2025, 4, 10).atStartOfDay(ZoneId.systemDefault()).toInstant())
         return book
     }
 

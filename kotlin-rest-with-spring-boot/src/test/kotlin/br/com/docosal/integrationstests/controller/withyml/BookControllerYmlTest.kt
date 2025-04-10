@@ -6,6 +6,7 @@ import br.com.docosal.integrationstests.testcontainers.AbstractIntegrationTest
 import br.com.docosal.integrationstests.vo.AccountCredentialsDTO
 import br.com.docosal.integrationstests.vo.BookDTO
 import br.com.docosal.integrationstests.vo.TokenDTO
+import br.com.docosal.integrationstests.vo.wrappers.WrapperBookDTO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -204,20 +205,23 @@ class BookControllerYmlTest : AbstractIntegrationTest() {
     @Test
     @Order(5)
     fun `deve retornar todas as pessoas cadastradas`() {
-        var books = RestAssured.given()
+        var wrapper = RestAssured.given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_YML)
+            .queryParams("page", 1, "size", 12, "direction", "asc")
             .`when`()
             .get()
             .then()
             .statusCode(200)
             .extract()
             .response()
-            .`as`(Array<BookDTO>::class.java, objectMapper)
+            .`as`(WrapperBookDTO::class.java, objectMapper)
 
-        var bookOne = books[0]
+        val books = wrapper.embeded!!.books
 
-        assertNotNull(bookOne.key)
+        var bookOne = books?.get(0)
+
+        assertNotNull(bookOne!!.key)
         assertNotNull(bookOne.author)
         assertNotNull(bookOne.launchDate)
         assertNotNull(bookOne.price)
@@ -225,13 +229,13 @@ class BookControllerYmlTest : AbstractIntegrationTest() {
 
         assertTrue(bookOne.key > 0)
 
-        assertEquals("Michael C. Feathers", bookOne.author)
-        assertEquals("Working effectively with legacy code", bookOne.title)
-        assertEquals(49.00, bookOne.price)
+        assertEquals("Marc J. Schiller", bookOne.author)
+        assertEquals("Os 11 segredos de líderes de TI altamente influentes", bookOne.title)
+        assertEquals(45.00, bookOne.price)
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     fun `deve retornar acesso negado - FindAll sem token`() {
         var specificationWithoutToken = RequestSpecBuilder()
             .setConfig(
