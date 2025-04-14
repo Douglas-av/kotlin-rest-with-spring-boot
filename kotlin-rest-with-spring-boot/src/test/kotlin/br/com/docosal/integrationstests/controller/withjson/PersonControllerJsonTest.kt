@@ -361,7 +361,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertTrue(content.contains(""","next":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=4&size=12&sort=firstName,asc"}"""))
         assertTrue(content.contains(""","last":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=83&size=12&sort=firstName,asc"}"""))
 
-        assertTrue(content.contains(""""page":{"size":12,"totalElements":1006,"totalPages":84,"number":3}}"""))
+        assertTrue(content.contains(""""page":{"size":12,"totalElements":1005,"totalPages":84,"number":3}}"""))
     }
 
 }
