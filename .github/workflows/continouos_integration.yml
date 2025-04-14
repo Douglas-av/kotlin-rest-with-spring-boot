@@ -31,6 +31,10 @@ jobs:
        java-version: '21'
        distribution: 'adopt'
        cache: maven
+    
+    - name: Build Application Jar
+      working-directory: ./kotlin-rest-with-spring-boot
+      run: mvn clean package
 
     - name: Build Application Jar
       working-directory: ./
