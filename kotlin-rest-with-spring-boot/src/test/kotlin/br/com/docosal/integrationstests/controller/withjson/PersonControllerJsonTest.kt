@@ -352,8 +352,8 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
 
         assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/799"}}}"""))
         assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/201"}}}"""))
-        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/947"}}}"""))
-        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/571"}}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/688"}}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8888/api/person/v1/689"}}}"""))
 
         assertTrue(content.contains("""{"first":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=0&size=12&sort=firstName,asc"}"""))
         assertTrue(content.contains(""","prev":{"href":"http://localhost:8888/api/person/v1?direction=asc&page=2&size=12&sort=firstName,asc"}"""))
