@@ -2,7 +2,7 @@
 cors:
   originPatterns: http://localhost:3000, http://localhost:8080
 file:
-  upload-dir: /UploadDir
+  upload-dir: /home/runner/work/kotlin-rest-with-spring-boot/UploadDir
 security:
   jwt:
     token:
