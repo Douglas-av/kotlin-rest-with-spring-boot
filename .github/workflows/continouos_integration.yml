@@ -30,7 +30,7 @@ jobs:
       with:
        java-version: '21'
        distribution: 'adopt'
-       cache: 'maven'
+       cache: maven
     
     - name: Build Application Jar
       working-directory: ./kotlin-rest-with-spring-boot
@@ -42,7 +42,6 @@ jobs:
 
     - name: Push to Docker Hub Container registry
       run: |
-        echo ${{ secrets.DOCKERHUB_USERNAME }}
         docker tag ${{ secrets.DOCKERHUB_USERNAME }}/rest-with-spring-boot-docosal:latest ${{ secrets.DOCKERHUB_USERNAME }}/rest-with-spring-boot-docosal:${{ github.run_id }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/rest-with-spring-boot-docosal/${{ github.run_id }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/rest-with-spring-boot-docosal/latest
