@@ -40,6 +40,3 @@ jobs:
         docker tag $IMAGE_NAME:latest $IMAGE_NAME:${{ github.run_id }}
         docker push $IMAGE_NAME:${{ github.run_id }}
         docker push $IMAGE_NAME:latest
-
-    - name: Upload dependency graph for Dependabot (optional)
-      uses: advanced-security/maven-dependency-submission-action@v4
