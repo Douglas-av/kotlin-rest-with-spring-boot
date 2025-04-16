@@ -34,8 +34,9 @@ jobs:
       run: docker compose build
 
     - name: Push Docker image to Docker Hub
+      env:
+        IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/rest-with-spring-boot-docosal
       run: |
-        IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/rest-with-spring-boot-docosal
         docker tag $IMAGE_NAME:latest $IMAGE_NAME:${{ github.run_id }}
         docker push $IMAGE_NAME:${{ github.run_id }}
         docker push $IMAGE_NAME:latest
