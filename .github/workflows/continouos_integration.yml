@@ -49,10 +49,10 @@ jobs:
       env:
         IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/rest-with-spring-boot-docosal
       run: |
-        docker tag $IMAGE_NAME:latest ${{ ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
-        docker tag $IMAGE_NAME:latest ${{ ECR_IMAGE_REPO_URL }}:latest
-        docker push ${{ ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
-        docker push ${{ ECR_IMAGE_REPO_URL }}:latest
+        docker tag $IMAGE_NAME:latest ${{ secrets.ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
+        docker tag $IMAGE_NAME:latest ${{ secrets.ECR_IMAGE_REPO_URL }}:latest
+        docker push ${{ secrets.ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
+        docker push ${{ secrets.ECR_IMAGE_REPO_URL }}:latest
 
     - name: Push Docker image to Docker Hub
       env:
