@@ -104,10 +104,10 @@ class PersonService {
         val entity = repository.findById(person.key)
             .orElseThrow {ResourceNotFoundException("No records found for this ID!")}
 
-        entity.firstName = person.firstName
-        entity.lastName = person.lastName
-        entity.address = person.address
-        entity.gender = person.gender
+        entity.firstName = if (person.firstName.isBlank()) entity.firstName else person.firstName
+        entity.lastName = person.lastName.ifBlank { entity.lastName }
+        entity.address = person.address.ifBlank { entity.address }
+        entity.gender = if (person.gender.isBlank()) entity.gender else person.gender
 
         var personVO: PersonVO = DozerMapper.parseObject(repository.save(entity), PersonVO::class.java)
         val withSelfRel = linkTo(PersonController::class.java).slash(personVO.key).withSelfRel()
