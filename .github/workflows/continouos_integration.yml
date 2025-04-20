@@ -50,8 +50,8 @@ jobs:
       run: |
         docker tag $IMAGE_NAME:latest ${{ secrets.ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
         docker tag $IMAGE_NAME:latest ${{ secrets.ECR_IMAGE_REPO_URL }}:latest
-        docker push ${{ secrets.ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
-        docker push ${{ secrets.ECR_IMAGE_REPO_URL }}:latest
+        docker compose push ${{ secrets.ECR_IMAGE_REPO_URL }}:${{ github.run_id }}
+        docker compose push ${{ secrets.ECR_IMAGE_REPO_URL }}:latest
 
     - name: Download task definition
       run: |
