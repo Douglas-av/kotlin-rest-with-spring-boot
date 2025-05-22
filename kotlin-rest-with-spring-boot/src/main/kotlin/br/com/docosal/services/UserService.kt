@@ -9,13 +9,14 @@ import br.com.docosal.mapper.custom.BookMapper
 import br.com.docosal.model.Book
 import br.com.docosal.repository.BookRepository
 import br.com.docosal.repository.UserRepository
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
+import org.apache.logging.log4j.Logger
 
 @Service
 class UserService(@field:Autowired var repository: UserRepository) : UserDetailsService {
@@ -23,7 +24,7 @@ class UserService(@field:Autowired var repository: UserRepository) : UserDetails
 //    @Autowired
 //    lateinit var repository: UserRepository
 
-    private val logger = Logger.getLogger(UserService::class.java.name)
+    private val logger : Logger = LogManager.getLogger(UserService::class.java.name)
 
     fun findById(id : Long): BookDTO {
         logger.info("Finding a book! ID: $id")

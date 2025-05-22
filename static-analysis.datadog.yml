@@ -1,0 +1,20 @@
+schema-version: v1
+rulesets:
+  - kotlin-security
+  - kotlin-inclusive
+  - kotlin-code-style:
+    rules:
+      function-return-type-spacing:
+        ignore:
+          - "**"
+      annotation-spacing:
+        ignore:
+          - "**"
+      argument-list-wrapping:
+        ignore:
+          - "**"
+      multiline-if-else:
+        ignore:
+          - "**"
+  - kotlin-best-practices
+  - github-actions

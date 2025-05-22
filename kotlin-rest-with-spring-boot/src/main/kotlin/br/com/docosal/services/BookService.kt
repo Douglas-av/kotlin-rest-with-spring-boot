@@ -8,13 +8,14 @@ import br.com.docosal.mapper.DozerMapper
 import br.com.docosal.mapper.custom.BookMapper
 import br.com.docosal.model.Book
 import br.com.docosal.repository.BookRepository
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.web.PagedResourcesAssembler
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
+import org.apache.logging.log4j.Logger
 import org.springframework.data.domain.Pageable
 
 @Service
@@ -29,7 +30,7 @@ class BookService {
     @Autowired
     lateinit var mapper : BookMapper
 
-    private val logger = Logger.getLogger(BookService::class.java.name)
+    private val logger : Logger = LogManager.getLogger(BookService::class.java.name)
 
     fun findAll(pageable: Pageable): PagedModel<EntityModel<BookDTO>> {
         logger.info("Finding all books!")

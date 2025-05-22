@@ -1,8 +1,13 @@
 #spring.application.name=kotlin-rest-with-spring-boot
+datadog:
+  port: 8125
+  hostname: localhost
+  prefix: statsd
 cors:
   originPatterns: http://localhost:3000, http://localhost:8080
 file:
-  upload-dir: /home/runner/work/kotlin-rest-with-spring-boot/UploadDir
+  #upload-dir: /UploadDir #usar para testar local
+  upload-dir: /home/runner/work/kotlin-rest-with-spring-boot/UploadDir #necessario para passar no git actions
 security:
   jwt:
     token:

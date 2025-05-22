@@ -4,6 +4,7 @@ import br.com.docosal.data.vo.v1.UploadFileResponseDTO
 import br.com.docosal.services.FileStorageService
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
@@ -17,14 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.util.logging.Logger
+import org.apache.logging.log4j.Logger
 
 @Tag(name = "File Endpoint")
 @RestController
 @RequestMapping("/api/file/v1")
 class FileController {
 
-    private val logger: Logger = Logger.getLogger(FileController::class.java.name)
+    private val logger: Logger = LogManager.getLogger(FileController::class.java.name)
 
     @Autowired
     private lateinit var fileStorageService: FileStorageService

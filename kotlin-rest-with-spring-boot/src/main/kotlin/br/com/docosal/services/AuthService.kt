@@ -4,6 +4,7 @@ import br.com.docosal.data.vo.v1.AccountCredentialsDTO
 import br.com.docosal.data.vo.v1.TokenDTO
 import br.com.docosal.repository.UserRepository
 import br.com.docosal.security.jwt.JwtTokenProvider
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -12,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
+import org.apache.logging.log4j.Logger
 
 @Service
 class AuthService {
@@ -26,7 +27,7 @@ class AuthService {
     @Autowired
     lateinit var repository: UserRepository
 
-    private val logger = Logger.getLogger(BookService::class.java.name)
+    private val logger : Logger = LogManager.getLogger(BookService::class.java.name)
 
     fun signin(data: AccountCredentialsDTO) : ResponseEntity<*> {
         logger.info("Trying log user ${data.username}")

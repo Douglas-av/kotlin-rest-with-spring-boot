@@ -20,12 +20,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import br.com.docosal.data.vo.v2.PersonVO as PersonVOV2
 
-//@CrossOrigin
+// @CrossOrigin
 @RestController
 @RequestMapping("/api/person/v1")
 @Tag(name = "People", description = "Endpoints for Managing People.")
 class PersonController {
-
     @Autowired
     private lateinit var service: PersonService
 //  var service: PersonService = PersonService()
@@ -79,7 +78,10 @@ class PersonController {
         return ResponseEntity.ok(service.findAll(pageable))
     }
 
-    @GetMapping(value = ["/findPersonByName/{firstName}"], produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
+    @GetMapping(
+        value = ["/findPersonByName/{firstName}"],
+        produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML]
+    )
     @Operation(
         summary = "Finds a person that contains a string", description = "Finds a person that contains a string",
         tags = ["People"],
@@ -123,11 +125,10 @@ class PersonController {
         @RequestParam(value = "direction", defaultValue = "asc") direction: String
     ): ResponseEntity<PagedModel<EntityModel<PersonVO>>> {
         val sortDirection: Sort.Direction =
-            if("desc".equals(direction, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
+            if ("desc".equals(direction, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "firstName"))
         return ResponseEntity.ok(service.findPersonByName(firstName, pageable))
     }
-
 
 
     @GetMapping(

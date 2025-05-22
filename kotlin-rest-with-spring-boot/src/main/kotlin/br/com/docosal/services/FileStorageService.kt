@@ -3,6 +3,8 @@ package br.com.docosal.services
 import br.com.docosal.config.FileStorageConfig
 import br.com.docosal.exceptions.FileStorageException
 import br.com.docosal.exceptions.MyFileNotFoundException
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
@@ -14,14 +16,13 @@ import java.nio.file.Path
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.util.logging.Logger
 
 @Service
 class FileStorageService @Autowired constructor(fileStorageConfig: FileStorageConfig) {
 
     private val fileStorageLocation: Path
 
-    private val logger : Logger = Logger.getLogger(FileStorageService::class.java.name)
+    private val logger : Logger = LogManager.getLogger(FileStorageService::class.java.name)
 
     init {
         fileStorageLocation = Paths.get(fileStorageConfig.uploadDir).toAbsolutePath().normalize()

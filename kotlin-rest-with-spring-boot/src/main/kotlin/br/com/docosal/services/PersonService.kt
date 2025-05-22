@@ -9,8 +9,8 @@ import br.com.docosal.mapper.DozerMapper
 import br.com.docosal.mapper.custom.PersonMapper
 import br.com.docosal.model.Person
 import br.com.docosal.repository.PersonRepository
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
 import org.springframework.hateoas.EntityModel
@@ -18,7 +18,7 @@ import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.logging.Logger
+import org.apache.logging.log4j.Logger
 
 @Service
 class PersonService {
@@ -32,7 +32,7 @@ class PersonService {
     @Autowired
     private lateinit var mapper: PersonMapper
 
-    private val logger = Logger.getLogger(PersonService::class.java.name)
+    private val logger : Logger = LogManager.getLogger(PersonService::class.java.name)
 
     fun findAll(pageable: Pageable): PagedModel<EntityModel<PersonVO>>{
         logger.info("Finding all persons!")

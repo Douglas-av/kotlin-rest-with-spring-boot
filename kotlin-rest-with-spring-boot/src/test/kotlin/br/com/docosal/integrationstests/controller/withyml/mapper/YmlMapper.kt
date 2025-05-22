@@ -7,8 +7,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import io.restassured.mapper.ObjectMapper
 import io.restassured.mapper.ObjectMapperDeserializationContext
 import io.restassured.mapper.ObjectMapperSerializationContext
+import org.apache.logging.log4j.LogManager
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException
-import java.util.logging.Logger
+import org.apache.logging.log4j.Logger
 import com.fasterxml.jackson.databind.ObjectMapper as JacksonObjectMapper
 
 class YMLMapper : ObjectMapper{
@@ -16,7 +17,7 @@ class YMLMapper : ObjectMapper{
     private val objectMapper: JacksonObjectMapper = JacksonObjectMapper(YAMLFactory())
     private val typeFactory: TypeFactory = TypeFactory.defaultInstance()
 
-    private val logger = Logger.getLogger(YMLMapper::class.java.name)
+    private val logger : Logger = LogManager.getLogger(YMLMapper::class.java.name)
 
     init {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -29,10 +30,10 @@ class YMLMapper : ObjectMapper{
             logger.info("Trying deserialize object of type $type")
             return objectMapper.readValue(dataToSerialize, typeFactory.constructType(type))
         } catch (e: JsonMappingException) {
-            logger.severe("Error deserializing object")
+            logger.error("Error deserializing object")
             e.printStackTrace()
         } catch (e: JsonProcessingException) {
-            logger.severe("Error deserializing object")
+            logger.error("Error deserializing object")
             e.printStackTrace()
         }
         return null
@@ -43,7 +44,7 @@ class YMLMapper : ObjectMapper{
             logger.info("Trying serialize object ${context.objectToSerialize}")
             return objectMapper.writeValueAsString(context.objectToSerialize)
         } catch (e: JsonProcessingException) {
-            logger.severe("Error serializing object")
+            logger.error("Error serializing object")
             e.printStackTrace()
         }
         return null
