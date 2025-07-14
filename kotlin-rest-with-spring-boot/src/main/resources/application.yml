@@ -37,3 +37,16 @@ spring-doc:
     - /auth/**
   swagger-ui:
     use-root-path: true
+
+logging:
+  level:
+    root: info
+
+management:
+  datadog:
+    metrics:
+      export:
+        enabled: true
+        api-key: ${DD_API_KEY}
+        uri: https://api.us5.datadoghq.com
+        step: 5s

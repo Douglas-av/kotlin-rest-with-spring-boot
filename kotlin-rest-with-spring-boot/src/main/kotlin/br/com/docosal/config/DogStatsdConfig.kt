@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 
-@ConfigurationProperties(prefix = "datadog")
+//@ConfigurationProperties(prefix = "datadog")
 class DogStatsdConfig {
     @Value("\${datadog.hostname}")
     var hostname: String = ""

@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 @Aspect
 @Component
 class PersonMetricsAspect {
-    @Autowired
+//    @Autowired
     private lateinit var personStatsdClient : DogStatsdConfig
 
     private val logger : Logger = LogManager.getLogger(this::class.java.name)

@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm
 
 @SpringBootApplication
-@EnableConfigurationProperties(DogStatsdConfig::class)
+@EnableConfigurationProperties//(DogStatsdConfig::class)
 class Startup
 fun main(args: Array<String>) {
 	runApplication<Startup>(*args)

@@ -4,6 +4,7 @@ import br.com.docosal.data.vo.v1.AccountCredentialsDTO
 import br.com.docosal.data.vo.v1.TokenDTO
 import br.com.docosal.repository.UserRepository
 import br.com.docosal.security.jwt.JwtTokenProvider
+import io.micrometer.observation.annotation.Observed
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -29,6 +30,7 @@ class AuthService {
 
     private val logger : Logger = LogManager.getLogger(BookService::class.java.name)
 
+    @Observed(name = "user.login", contextualName = "login")
     fun signin(data: AccountCredentialsDTO) : ResponseEntity<*> {
         logger.info("Trying log user ${data.username}")
         return try {

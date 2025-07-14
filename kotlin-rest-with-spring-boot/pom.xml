@@ -185,7 +185,16 @@
 			<artifactId>java-dogstatsd-client</artifactId>
 			<version>4.4.4</version>
 		</dependency>
-<!--		<dependency>-->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-datadog</artifactId>
+			<version>1.15.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<!--		<dependency>-->
 <!--			<groupId>org.springframework.boot</groupId>-->
 <!--			<artifactId>spring-boot-starter-security</artifactId>-->
 <!--		</dependency>-->
