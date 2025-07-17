@@ -24,6 +24,7 @@ class BookService {
     @Autowired
     lateinit var repository: BookRepository
 
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     lateinit var assembler: PagedResourcesAssembler<BookDTO>
 

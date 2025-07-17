@@ -15,16 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired
 @Component
 class PersonMetricsAspect {
 //    @Autowired
-    private lateinit var personStatsdClient : DogStatsdConfig
-
-    private val logger : Logger = LogManager.getLogger(this::class.java.name)
-
-    @Before("execution(* br.com.docosal.services.PersonService.findAll(..))")
-    fun countFindAll(joinPoint: JoinPoint) {
-        var methodName = joinPoint.signature.name
-        logger.info("Interceptando metodo ${methodName}.")
-        personStatsdClient.statsd.incrementCounter("${METRIC_INCREMENTCOUNTER_TAG}.${methodName}")
-        println("hostname= ${personStatsdClient.port}")
-    }
+//    private lateinit var personStatsdClient : DogStatsdConfig
+//
+//    private val logger : Logger = LogManager.getLogger(this::class.java.name)
+//
+//    @Before("execution(* br.com.docosal.services.PersonService.findAll(..))")
+//    fun countFindAll(joinPoint: JoinPoint) {
+//        var methodName = joinPoint.signature.name
+//        logger.info("Interceptando metodo ${methodName}.")
+//        personStatsdClient.statsd.incrementCounter("${METRIC_INCREMENTCOUNTER_TAG}.${methodName}")
+//        println("hostname= ${personStatsdClient.port}")
+//    }
 
 }
