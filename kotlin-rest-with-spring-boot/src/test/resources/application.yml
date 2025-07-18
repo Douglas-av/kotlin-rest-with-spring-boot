@@ -6,8 +6,8 @@ datadog:
 cors:
   originPatterns: http://localhost:3000, http://localhost:8080
 file:
-  #upload-dir: /UploadDir #usar para testar local
-  upload-dir: /home/runner/work/kotlin-rest-with-spring-boot/UploadDir #necessario para passar no git actions
+  upload-dir: /UploadDir #usar para testar local
+#  upload-dir: /home/runner/work/kotlin-rest-with-spring-boot/UploadDir #necessario para passar no git actions
 security:
   jwt:
     token:
@@ -35,3 +35,12 @@ spring-doc:
     - /auth/**
   swagger-ui:
     use-root-path: true
+
+management:
+  datadog:
+    metrics:
+      export:
+        enabled: true
+        api-key: ${DD_API_KEY}
+        uri: https://api.us5.datadoghq.com
+        step: 5s
