@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference
 class BookMetricsAspect {
 
     @Autowired
-    private lateinit var meterRegistry: DatadogMeterRegistry
+    private lateinit var meterRegistry: MeterRegistry
 
     private val logger: Logger = LogManager.getLogger(this::class.java.name)
 
