@@ -9,7 +9,7 @@
         <!-- Arquivo (rotação diária) -->
         <RollingFile name="File" fileName="logs\rest-spring-boot-docosal\rest-spring-boot-docosal.log"
                      filePattern="logs\rest-spring-boot-docosal\rest-spring-boot-docosal-%d{yyyy-MM-dd}.log.gz">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>

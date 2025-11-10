@@ -15,6 +15,8 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.apache.logging.log4j.Logger
+import org.slf4j.MDC
+import java.time.OffsetDateTime
 
 @Service
 class AuthService {
@@ -32,7 +34,14 @@ class AuthService {
 
     @Observed(name = "user.login", contextualName = "login")
     fun signin(data: AccountCredentialsDTO) : ResponseEntity<*> {
-        logger.info("Trying log user ${data.username}")
+        try {
+            MDC.put("className", this::class.java.name)
+            MDC.put("Time", OffsetDateTime.now().toString())
+            logger.info("Trying log user ${data.username}")
+        } finally {
+            MDC.clear()
+        }
+
         return try {
             val username = data.username
             val password = data.password
