@@ -16,7 +16,9 @@ import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
 import org.apache.logging.log4j.Logger
+import org.slf4j.MDC
 import org.springframework.data.domain.Pageable
+import java.time.OffsetDateTime
 
 @Service
 class BookService {
@@ -34,7 +36,13 @@ class BookService {
     private val logger : Logger = LogManager.getLogger(BookService::class.java.name)
 
     fun findAll(pageable: Pageable): PagedModel<EntityModel<BookDTO>> {
-        logger.info("Finding all books!")
+        try {
+            MDC.put("className", this::class.java.name)
+            MDC.put("Time", OffsetDateTime.now().toString())
+            logger.info("Finding all books!")
+        } finally {
+            MDC.clear()
+        }
         var books = repository.findAll(pageable)
         var booksDTO = books.map { b -> DozerMapper.parseObject(b, BookDTO::class.java) }
         booksDTO.map { b -> b.add(linkTo(BookController::class.java).slash(b.key).withSelfRel()) }
