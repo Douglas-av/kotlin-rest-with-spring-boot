@@ -13,7 +13,7 @@ security:
       secret-key: admin
       expire-length: 3600000
 server:
-  port: 80
+  port: 8880
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -53,7 +53,12 @@ management:
 
 cloud:
   aws:
+    region:
+      static: us-east-1
+    credentials:
+      access-key: fake
+      secret-key: fake
     sqs:
-      url: http://localhost:4566
+      endpoint: http://localhost:4566
       book-queue: book
       person-queue: person

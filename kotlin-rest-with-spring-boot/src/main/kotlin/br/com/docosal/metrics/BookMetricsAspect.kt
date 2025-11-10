@@ -28,7 +28,7 @@ class BookMetricsAspect {
 
     private val logger: Logger = LogManager.getLogger(this::class.java.name)
 
-    @Before("execution(* br.com.docosal.services.*.*(..))")
+//    @Before("execution(* br.com.docosal.services.*.*(..))")
     fun countMethodCall(joinPoint: JoinPoint) {
         val className = joinPoint.signature.declaringType.simpleName
         val methodName = joinPoint.signature.name

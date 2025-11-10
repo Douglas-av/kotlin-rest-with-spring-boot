@@ -37,6 +37,7 @@ class BookController {
 
     @Autowired
     private lateinit var service: BookService
+    @Autowired
     private lateinit var messageSenderService: MessageSender
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
