@@ -1,16 +1,24 @@
 package br.com.docosal.config
 
 import br.com.docosal.serilization.converter.YamlJackson2HttpMessageConverter
+import br.com.docosal.services.MyInterceptor
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebConfig : WebMvcConfigurer {
+class WebConfig(private val myInterceptor: MyInterceptor) : WebMvcConfigurer {
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(myInterceptor).addPathPatterns("/api/**")
+        super.addInterceptors(registry)
+    }
 
     // Lendo propriedade do arquivo de application.yml e associando o valor a uma variavel.
     @Value("\${cors.originPatterns:default}")

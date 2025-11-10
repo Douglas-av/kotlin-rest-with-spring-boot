@@ -5,6 +5,7 @@ import br.com.docosal.exceptions.InvalidJwtAuthenticationException
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.interfaces.DecodedJWT
 import jakarta.annotation.PostConstruct
 import jakarta.servlet.http.HttpServletRequest
@@ -95,7 +96,11 @@ class JwtTokenProvider {
     private fun decodedToken(token: String): DecodedJWT {
         val algorithm = Algorithm.HMAC256(secretKey.toByteArray())
         val verifier : JWTVerifier = JWT.require(algorithm).build()
-        return verifier.verify(token)
+        try {
+            return verifier.verify(token)
+        } catch (exception: JWTVerificationException) {
+            throw JWTVerificationException("Expired or invalid JWT Token! Confira! ${exception.message}")
+        }
     }
 
     fun resolveToke(request: HttpServletRequest) : String? {
@@ -111,7 +116,7 @@ class JwtTokenProvider {
             if (decodedJWT.expiresAt.before(Date())) false
             return true
         } catch (exception: Exception){
-            throw InvalidJwtAuthenticationException("Expired or invalid JWT Token! Confira!")
+            throw InvalidJwtAuthenticationException("Expired or invalid JWT Token! Confira! ${exception.message}")
         }
     }
 
