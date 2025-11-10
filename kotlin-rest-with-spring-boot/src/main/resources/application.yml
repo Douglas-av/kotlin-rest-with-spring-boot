@@ -50,3 +50,10 @@ management:
         api-key: ${DD_API_KEY}
         uri: https://api.us5.datadoghq.com
         step: 5s
+
+cloud:
+  aws:
+    sqs:
+      url: http://localhost:4566
+      book-queue: book
+      person-queue: person

@@ -5,6 +5,7 @@ import br.com.docosal.data.vo.v1.PersonVO
 import br.com.docosal.exceptions.ExceptionResponse
 import br.com.docosal.model.Book
 import br.com.docosal.services.BookService
+import br.com.docosal.services.MessageSender
 import br.com.docosal.util.MediaType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -36,6 +37,7 @@ class BookController {
 
     @Autowired
     private lateinit var service: BookService
+    private lateinit var messageSenderService: MessageSender
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Find All Books", description = "Find All Books",
@@ -124,8 +126,9 @@ class BookController {
             ])
         ]
     )
-    fun create(@RequestBody book: BookDTO): BookDTO{
-        return service.create(book)
+    fun create(@RequestBody bookDTO: BookDTO): BookDTO{
+        return messageSenderService.publishBook(bookDTO)
+//        return service.create(bookDTO)
     }
 
     @PutMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML],

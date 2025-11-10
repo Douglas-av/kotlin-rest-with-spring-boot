@@ -35,6 +35,7 @@
 		<testcontainers.version>1.20.6</testcontainers.version>
 		<rest-assured.version>5.5.1</rest-assured.version>
 		<java-jwt.version>4.5.0</java-jwt.version>
+		<spring-cloud.version>3.0.0</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -133,6 +134,17 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>localstack</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.github.dozermapper</groupId>
 			<artifactId>dozer-core</artifactId>
 			<version>${dozer.version}</version>
@@ -185,6 +197,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.awspring.cloud</groupId>
+			<artifactId>spring-cloud-aws-sqs</artifactId>
+			<version>${spring-cloud.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.datadoghq</groupId>

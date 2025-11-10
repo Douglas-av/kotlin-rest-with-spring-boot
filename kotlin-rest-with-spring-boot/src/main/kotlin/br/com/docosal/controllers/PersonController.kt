@@ -3,6 +3,7 @@ package br.com.docosal.controllers
 import br.com.docosal.data.vo.v1.PersonVO
 import br.com.docosal.exceptions.ExceptionResponse
 import br.com.docosal.exceptions.handler.GlobalExceptionHandler
+import br.com.docosal.services.MessageSender
 import br.com.docosal.services.PersonService
 import br.com.docosal.util.MediaType
 import io.swagger.v3.oas.annotations.Operation
@@ -27,7 +28,9 @@ import br.com.docosal.data.vo.v2.PersonVO as PersonVOV2
 class PersonController {
     @Autowired
     private lateinit var service: PersonService
-//  var service: PersonService = PersonService()
+
+    @Autowired
+    private lateinit var messageSenderService: MessageSender
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(
@@ -257,7 +260,8 @@ class PersonController {
         ]
     )
     fun create(@RequestBody personVO: PersonVO): PersonVO {
-        return service.create(personVO)
+        return messageSenderService.publishPerson(personVO)
+    //        return service.create(personVO)
     }
 
 
