@@ -6,8 +6,10 @@ import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMod
 import io.awspring.cloud.sqs.operations.SqsTemplate
 import io.awspring.cloud.sqs.operations.TemplateAcknowledgementMode
 import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -15,16 +17,29 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient
 import java.net.URI
 
 @Configuration
+@Profile("!test")
 class SqsConfig {
+
+    @Value("\${cloud.aws.credentials.access-key}")
+    private val accessKey = ""
+
+    @Value("\${cloud.aws.credentials.secret-key}")
+    private val secretKey = ""
+
+    @Value("\${cloud.aws.region.static}")
+    private val region = ""
+
+    @Value("\${cloud.aws.sqs.endpoint}")
+    private val endpoint = ""
 
     @Bean
     fun sqsAsyncClient(): SqsAsyncClient {
         return SqsAsyncClient.builder()
-            .region(Region.US_EAST_1) // Set your region
-            .endpointOverride(URI.create("http://localhost:4566"))
+            .region(Region.of(region)) // Set your region
+            .endpointOverride(URI.create(endpoint))
             .credentialsProvider(
                 StaticCredentialsProvider.create( // <-- Necessário para LocalStack/SDK v2
-                    AwsBasicCredentials.create("fake", "fake")
+                    AwsBasicCredentials.create(accessKey, secretKey)
                 )
             )
             .build()

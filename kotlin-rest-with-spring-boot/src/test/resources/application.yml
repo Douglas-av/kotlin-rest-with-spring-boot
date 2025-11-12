@@ -44,3 +44,15 @@ management:
         api-key: 123456
         uri: https://api.us5.datadoghq.com
         step: 5s
+
+cloud:
+  aws:
+    region:
+      static: us-east-1
+    credentials:
+      access-key: fake
+      secret-key: fake
+    sqs:
+      endpoint: http://localhost:4566
+      book-queue: book
+      person-queue: person
