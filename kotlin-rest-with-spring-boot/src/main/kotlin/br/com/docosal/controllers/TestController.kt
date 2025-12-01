@@ -23,6 +23,11 @@ class TestController {
     )
     fun test(req: HttpServletRequest, res: HttpServletResponse): ResponseEntity<Any> {
         req.headerNames.iterator().forEachRemaining { logger.info("Header: ${it} - ${req.getHeader(it)}") }
+        logger.info("RemoteAddr: ${req.remoteAddr}")
+        run {
+            val ip: String = req.getHeader("x-forwarded-for") ?: req.remoteAddr
+            logger.info("IP: $ip")
+        }
         return ResponseEntity.ok("Sucesso")
     }
 
