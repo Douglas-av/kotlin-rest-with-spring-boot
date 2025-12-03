@@ -55,7 +55,8 @@ jobs:
 
     - name: Download task definition
       run: |
-        echo ${{secrets.TASK_DEFINITION_NAME}} | sed 's/./& /g'
+        echo ${{ secrets.SERVICE_NAME }} | sed 's/./& /g'
+        echo ${{ secrets.CLUSTER_NAME }} | sed 's/./& /g'
         aws ecs describe-task-definition --task-definition ${{ secrets.TASK_DEFINITION_NAME }} --query taskDefinition > task-definition.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
