@@ -4,6 +4,7 @@ import br.com.docosal.util.MediaType
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,7 +29,7 @@ class TestController {
             val ip: String = req.getHeader("x-forwarded-for") ?: req.remoteAddr
             logger.info("IP: $ip")
         }
-        return ResponseEntity.ok("Sucesso")
+        return ResponseEntity.status(HttpStatus.OK).body("Sucesso")
     }
 
 }
