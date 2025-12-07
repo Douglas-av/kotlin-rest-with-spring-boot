@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -36,6 +39,8 @@ class BookController {
 
     @Autowired
     private lateinit var service: BookService
+
+    private val logger = LoggerFactory.getLogger(TestController::class.java)
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML])
     @Operation(summary = "Find All Books", description = "Find All Books",
@@ -124,7 +129,9 @@ class BookController {
             ])
         ]
     )
-    fun create(@RequestBody book: BookDTO): BookDTO{
+    fun create(@RequestBody book: BookDTO, req: HttpServletRequest, res: HttpServletResponse): BookDTO{
+        req.headerNames.iterator().forEachRemaining { logger.info("Header: ${it} - ${req.getHeader(it)}") }
+        logger.info("RemoteAddr: ${req.remoteAddr}")
         return service.create(book)
     }
 
